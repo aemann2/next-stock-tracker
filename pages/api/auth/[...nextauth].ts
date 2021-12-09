@@ -14,27 +14,23 @@ export default NextAuth({
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
 		}),
 		CredentialsProvider({
-			name: 'Email and Password',
+			name: 'credentials',
 			credentials: {
 				email: {
 					label: 'Email',
-					type: 'text',
+					type: 'email',
 					placeholder: 'jsmith@hotmail.com',
 				},
 				password: { label: 'Password', type: 'password' },
 			},
 			async authorize(credentials, req) {
-				// Add logic here to look up the user from the credentials supplied....we need to do a DB lookup
 				const user = { id: 1, name: 'J Smith', email: 'jsmith@example.com' };
 
 				if (user) {
 					// Any object returned will be saved in `user` property of the JWT
-					console.log('yes');
-					console.log(user);
 					return user;
 				} else {
 					// If you return null or false then the credentials will be rejected
-					console.log('no');
 					return null;
 					// You can also Reject this callback with an Error or with a URL:
 					// throw new Error('error message') // Redirect to error page
@@ -42,15 +38,36 @@ export default NextAuth({
 				}
 			},
 		}),
+		// 		// Add logic here to look up the user from the credentials supplied....we need to do a DB lookup
+		// 		if (
+		// 			credentials!.email === 'test@test.com' &&
+		// 			credentials!.password === '123'
+		// 		) {
+		// 			return {
+		// 				id: 1,
+		// 				name: 'test',
+		// 				email: 'test@test.com',
+		// 			};
+
+		// 			// if (user) {
+		// 			// 	// Any object returned will be saved in `user` property of the JWT
+		// 			// 	console.log('yes');
+		// 			// 	console.log(user);
+		// 			// 	return user;
+		// 		}
+		// 		return null;
+		// 	},
+		// }),
 	],
 	callbacks: {
-		jwt: ({ token, user }) => {
+		async jwt({ token, user }) {
 			if (user) {
 				token.id = user.id;
 			}
 			return token;
 		},
-		session: ({ session, token }) => {
+		async session({ session, token }) {
+			console.log('RUNNING');
 			if (token) {
 				session.id = token.id;
 			}
