@@ -7,7 +7,7 @@ generator client {
   provider        = "prisma-client-js"
 }
 
-model Portfolio {
+model Transaction {
   id      Int    @id @default(autoincrement())
   userId String
   symbol  String
@@ -15,7 +15,7 @@ model Portfolio {
   user   User  @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model Transaction {
+model History {
   id         Int      @id @default(autoincrement())
   userId    String
   symbol     String
@@ -35,8 +35,8 @@ model User {
   balance      Decimal        @default(10000.00) @db.Decimal
   accounts      Account[]
   sessions      Session[]
-  portfolio Portfolio[]
   transactions Transaction[]
+  history History[]
 }
 
 model Account {
