@@ -9,21 +9,21 @@ generator client {
 
 model Portfolio {
   id      Int    @id @default(autoincrement())
-  user_id String
+  userId String
   symbol  String
   shares  Int
-  users   User  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user   User  @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model Transaction {
   id         Int      @id @default(autoincrement())
-  user_id    String
+  userId    String
   symbol     String
   shares     Int
   price      Decimal  @db.Decimal
-  trans_type String
+  transType String
   transacted DateTime @db.Timestamptz(6)
-  users      User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user      User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model User {
@@ -35,7 +35,7 @@ model User {
   balance      Decimal        @default(10000.00) @db.Decimal
   accounts      Account[]
   sessions      Session[]
-  portfolios Portfolio[]
+  portfolio Portfolio[]
   transactions Transaction[]
 }
 
