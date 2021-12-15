@@ -15,7 +15,7 @@ model Stock {
   user   User  @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model History {
+model Transaction {
   id         Int      @id @default(autoincrement())
   userId    String
   symbol     String
@@ -36,7 +36,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   stocks Stock[]
-  history History[]
+  transactions Transaction[]
 }
 
 model Account {
