@@ -7,7 +7,7 @@ generator client {
   provider        = "prisma-client-js"
 }
 
-model Transaction {
+model Stock {
   id      Int    @id @default(autoincrement())
   userId String
   symbol  String
@@ -35,7 +35,7 @@ model User {
   balance      Decimal        @default(10000.00) @db.Decimal
   accounts      Account[]
   sessions      Session[]
-  transactions Transaction[]
+  stocks Stock[]
   history History[]
 }
 
