@@ -20,10 +20,15 @@ model Transaction {
   userId    String
   symbol     String
   shares     Int
-  price      Decimal  @db.Decimal
-  transType String
-  transacted DateTime @db.Timestamptz(6)
+  price      Decimal  @db.Decimal(10, 2)
+  transType TransType
+  transacted DateTime @default(now())
   user      User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum TransType {
+  BUY
+  SELL
 }
 
 model User {
