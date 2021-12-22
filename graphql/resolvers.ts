@@ -1,5 +1,15 @@
 export const resolvers = {
 	Query: {
-		links: () => ['test1', 'test2', 'test3'],
+		users: () => [
+			{
+				id: '123',
+				name: 'John Doe',
+				email: 'john@test.com',
+				image: '123123',
+				balance: 10000,
+				stocks: [],
+				transactions: [],
+			},
+		],
 	},
 };
