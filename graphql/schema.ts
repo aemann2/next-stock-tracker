@@ -7,8 +7,8 @@ export const typeDefs = gql`
 		email: String
 		image: String
 		balance: Float
-		stocks: [Stock]
-		transactions: [Transaction]
+		# stocks: [Stock]
+		# transactions: [Transaction]
 	}
 
 	type Stock {
@@ -34,6 +34,7 @@ export const typeDefs = gql`
 	}
 
 	type Query {
+		user(email: String): User
 		users: [User]
 	}
 `;

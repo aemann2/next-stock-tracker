@@ -4,8 +4,27 @@ export const resolvers = {
 	Query: {
 		users: async (_parent: any, _args: any, ctx: Context) =>
 			await ctx.prisma.user.findMany(),
+		user: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.user.findUnique({
+				where: {
+					email: args.email,
+				},
+			}),
 	},
 };
+
+// user: async (_parent: any, args: any, ctx: Context) =>
+// await ctx.prisma.user.findUnique({
+// 	where: {
+// 		email: args.email,
+// 	},
+// }),
+
+// await ctx.prisma.user.findUnique({
+// 	where: {
+// 		email: 'john2.test@test.com',
+// 	},
+// }),
 
 // Test query
 // Query: {
