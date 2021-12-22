@@ -1,6 +1,7 @@
 import { ApolloServer } from 'apollo-server-micro';
 import { typeDefs } from '../../graphql/schema';
 import { resolvers } from '../../graphql/resolvers';
+import { createContext } from '../../graphql/context';
 import Cors from 'micro-cors';
 
 // This is where the endpoint for our GQL server lives
@@ -8,7 +9,11 @@ import Cors from 'micro-cors';
 // gets us around cors errors
 const cors = Cors();
 
-const apolloServer = new ApolloServer({ typeDefs, resolvers });
+const apolloServer = new ApolloServer({
+	typeDefs,
+	resolvers,
+	context: createContext,
+});
 
 // starts the apollo server
 const startServer = apolloServer.start();
