@@ -1,30 +1,38 @@
+import prisma from '../lib/prisma';
+
 export const resolvers = {
 	Query: {
-		users: () => [
-			{
-				id: '123',
-				name: 'John Doe',
-				email: 'john@test.com',
-				image: '123123',
-				balance: 10000,
-				stocks: [
-					{
-						userId: '123',
-						symbol: 'APPL',
-						shares: 3,
-					},
-				],
-				transactions: [
-					{
-						userId: '123',
-						symbol: 'APPL',
-						shares: 3,
-						price: 9.2,
-						transType: 'BUY',
-						transacted: '10-14-1987',
-					},
-				],
-			},
-		],
+		users: async (_parent: any, args: any, context: any) =>
+			await context.prisma.user.findMany(),
 	},
 };
+
+// Test query
+// Query: {
+// 	users: () => [
+// 		{
+// 			id: '123',
+// 			name: 'John Doe',
+// 			email: 'john@test.com',
+// 			image: '123123',
+// 			balance: 10000,
+// 			stocks: [
+// 				{
+// 					userId: '123',
+// 					symbol: 'APPL',
+// 					shares: 3,
+// 				},
+// 			],
+// 			transactions: [
+// 				{
+// 					userId: '123',
+// 					symbol: 'APPL',
+// 					shares: 3,
+// 					price: 9.2,
+// 					transType: 'BUY',
+// 					transacted: '10-14-1987',
+// 				},
+// 			],
+// 		},
+// 	],
+// },
