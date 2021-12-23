@@ -10,6 +10,18 @@ export const resolvers = {
 					email: args.email,
 				},
 			}),
+		stocks: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.stock.findMany({
+				where: {
+					userId: args.userId,
+				},
+			}),
+		transactions: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.transaction.findMany({
+				where: {
+					userId: args.userId,
+				},
+			}),
 	},
 };
 
