@@ -23,6 +23,51 @@ export const resolvers = {
 				},
 			}),
 	},
+	Mutation: {
+		addStock: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.stock.create({
+				data: {
+					userId: args.userId,
+					symbol: args.symbol,
+					shares: args.shares,
+				},
+			}),
+		addTransaction: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.transaction.create({
+				data: {
+					userId: args.userId,
+					symbol: args.symbol,
+					shares: args.shares,
+					price: args.price,
+					transType: args.transType,
+					transacted: new Date('2021-03-19T14:21:00+0200'),
+				},
+			}),
+		modifyStock: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.stock.update({
+				where: {
+					id: args.id,
+				},
+				data: {
+					shares: args.shares,
+				},
+			}),
+		modifyUser: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.user.update({
+				where: {
+					id: args.id,
+				},
+				data: {
+					balance: args.balance,
+				},
+			}),
+		deleteStock: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.stock.delete({
+				where: {
+					id: args.id,
+				},
+			}),
+	},
 };
 
 // user: async (_parent: any, args: any, ctx: Context) =>

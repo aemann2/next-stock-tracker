@@ -13,7 +13,6 @@ export const typeDefs = gql`
 		userId: String
 		symbol: String
 		shares: Int
-		user: User
 	}
 
 	type Transaction {
@@ -23,7 +22,6 @@ export const typeDefs = gql`
 		price: Float
 		transType: transType
 		transacted: String
-		user: User
 	}
 
 	enum transType {
@@ -36,5 +34,24 @@ export const typeDefs = gql`
 		users: [User]
 		stocks(userId: String): [Stock]
 		transactions(userId: String): [Transaction]
+	}
+
+	type Mutation {
+		addStock(userId: String!, symbol: String!, shares: Int!): Stock
+
+		addTransaction(
+			userId: String!
+			symbol: String!
+			shares: Int!
+			price: Float!
+			transType: transType!
+			transacted: String
+		): Transaction
+
+		modifyStock(id: Int!, shares: Int!): Stock
+
+		modifyUser(id: String!, balance: Float!): User
+
+		deleteStock(id: Int!): Stock
 	}
 `;
