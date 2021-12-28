@@ -15,13 +15,12 @@ export default function Component() {
 	const { data: session } = useSession();
 	const { data, error, loading } = useQuery(allUsersQuery);
 
-	if (loading) return <p>Loading...</p>;
-
-	if (error) return <p>Oops, something went wrong {error.message}</p>;
-
-	console.log(data);
-
 	if (session) {
+		if (loading) return <p>Loading...</p>;
+
+		if (error) return <p>Oops, something went wrong {error.message}</p>;
+
+		console.log(data.users);
 		return (
 			<>
 				Signed in as {session.user.email} <br />
