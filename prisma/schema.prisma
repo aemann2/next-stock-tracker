@@ -37,7 +37,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  balance      Decimal        @default(10000.00) @db.Decimal
+  balance      Decimal        @default(10000.00) @db.Decimal(10, 2)
   accounts      Account[]
   sessions      Session[]
   stocks Stock[]
