@@ -10,7 +10,7 @@ interface IProps {
 	userId: string;
 }
 
-const transactionsQuery = gql`
+const TRANSACTIONS = gql`
 	query Transactions($userId: String!) {
 		transactions(userId: $userId) {
 			symbol
@@ -23,7 +23,7 @@ const transactionsQuery = gql`
 `;
 
 const History: React.FC<IProps> = (props) => {
-	const { data, error, loading } = useQuery(transactionsQuery, {
+	const { data, error, loading } = useQuery(TRANSACTIONS, {
 		variables: { userId: props.userId },
 	});
 	// const { transactions } = data;
@@ -32,7 +32,6 @@ const History: React.FC<IProps> = (props) => {
 	// console.log(data);
 	data && console.log(data);
 	return (
-		// <div>test</div>
 		<div>
 			<p>{props.user.email}</p>
 			{data &&
