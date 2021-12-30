@@ -7,11 +7,12 @@ interface IProps {
 	user: {
 		email: string;
 	};
+	userId: string;
 }
 
 const transactionsQuery = gql`
-	query {
-		transactions(userId: "ckxb08eq300007jzt3ftpn0s7") {
+	query Transactions($userId: String!) {
+		transactions(userId: $userId) {
 			symbol
 			shares
 			price
@@ -22,14 +23,22 @@ const transactionsQuery = gql`
 `;
 
 const History: React.FC<IProps> = (props) => {
-	const { data, error, loading } = useQuery(transactionsQuery);
-	const { transactions } = data;
+	const { data, error, loading } = useQuery(transactionsQuery, {
+		variables: { userId: props.userId },
+	});
+	// const { transactions } = data;
+	loading && <p>Loading...</p>;
+	error && <p>Oops, something went wrong {error.message}</p>;
+	// console.log(data);
+	data && console.log(data);
 	return (
+		// <div>test</div>
 		<div>
 			<p>{props.user.email}</p>
-			{transactions.map((transaction: any, index: any) => (
-				<p key={index}>{transaction.symbol}</p>
-			))}
+			{data &&
+				data.transactions.map((transaction: any, index: any) => (
+					<p key={index}>{transaction.symbol}</p>
+				))}
 		</div>
 	);
 };

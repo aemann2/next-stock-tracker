@@ -17,4 +17,10 @@ export default NextAuth({
 			from: process.env.EMAIL_FROM,
 		}),
 	],
+	callbacks: {
+		async session({ session, token, user }) {
+			session.userId = user.id;
+			return Promise.resolve(session);
+		},
+	},
 });
