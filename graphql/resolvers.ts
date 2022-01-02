@@ -44,9 +44,10 @@ export const resolvers = {
 				},
 			}),
 		modifyStock: async (_parent: any, args: any, ctx: Context) =>
-			await ctx.prisma.stock.update({
+			await ctx.prisma.stock.updateMany({
 				where: {
-					id: args.id,
+					userId: args.userId,
+					symbol: args.symbol,
 				},
 				data: {
 					shares: args.shares,

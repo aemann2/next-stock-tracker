@@ -10,58 +10,35 @@ interface IProps {
 	userId: string;
 }
 
-const ADD_STOCK = gql`
-	mutation AddStock($userId: String!) {
-		addStock(userId: $userId, symbol: "AAPL", shares: 99) {
-			id
-		}
-	}
-`;
-const MODIFY_STOCK = gql`
-	mutation ModifyStock($id: String!) {
-		modifyStock(id: $id, shares: 12) {
-			userId
-		}
-	}
-`;
+// I should use upsert here in case the user already has a stock
 
-const MODIFY_USER = gql`
-	mutation ModifyUser($id: String!) {
-		modifyUser(id: $id, balance: 9938.23) {
-			id
-		}
-	}
-`;
-
-const ADD_TRANSACTION = gql`
-	mutation AddTransaction($userId: String!) {
+const BUY_STOCK = gql`
+	mutation BuyStock($userId: String!, $shares: Int!, $symbol: String!) {
 		addTransaction(
 			userId: $userId
-			symbol: "AAPL"
-			shares: 99
+			symbol: $symbol
+			shares: $shares
 			price: 48.39
 			transType: BUY
 		) {
+			userId
+		}
+		addStock(userId: $userId, symbol: $symbol, shares: $shares) {
+			userId
+		}
+		modifyUser(id: $userId, balance: 9938.23) {
 			userId
 		}
 	}
 `;
 
 const Buy: React.FC<IProps> = (props) => {
-	const [addStock, { data, loading, error }] = useMutation(ADD_STOCK, {
-		variables: { userId: props.userId },
-	});
-	const [addTransaction, { data: data2, loading: loading2, error: error2 }] =
-		useMutation(ADD_TRANSACTION, {
-			variables: { userId: props.userId },
+	const [BuyStock, { data: data2, loading: loading2, error: error2 }] =
+		useMutation(BUY_STOCK, {
+			variables: { userId: props.userId, symbol: 'TEST', shares: 99 },
 		});
-	loading2 && <p>Loading...</p>;
-	error2 && <p>Oops, something went wrong {error2.message}</p>;
-	addStock({
-		variables: { userId: props.userId },
-	});
-	addTransaction({
-		variables: { userId: props.userId },
+	BuyStock({
+		variables: { userId: props.userId, symbol: 'TEST', shares: 99 },
 	});
 	return (
 		<div>
