@@ -27,22 +27,23 @@ const BUY_STOCK = gql`
 			userId
 		}
 		modifyUser(id: $userId, balance: 9938.23) {
-			userId
+			id
 		}
 	}
 `;
 
 const Buy: React.FC<IProps> = (props) => {
-	const [BuyStock, { data: data2, loading: loading2, error: error2 }] =
-		useMutation(BUY_STOCK, {
+	const [BuyStock, { data: data, loading: loading, error: error }] =
+		useMutation(BUY_STOCK);
+	const buyStock = () => {
+		BuyStock({
 			variables: { userId: props.userId, symbol: 'TEST', shares: 99 },
 		});
-	BuyStock({
-		variables: { userId: props.userId, symbol: 'TEST', shares: 99 },
-	});
+	};
 	return (
 		<div>
 			<p>{props.user.email}</p>
+			<button onClick={buyStock}>Buy</button>
 		</div>
 	);
 };

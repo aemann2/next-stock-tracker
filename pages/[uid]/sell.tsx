@@ -31,16 +31,19 @@ const SELL_STOCK = gql`
 `;
 
 const Buy: React.FC<IProps> = (props) => {
-	const [SellStock, { data: data2, loading: loading2, error: error2 }] =
-		useMutation(SELL_STOCK, {
+	const [SellStock, { data: data, loading: loading, error: error }] =
+		useMutation(SELL_STOCK);
+
+	const sellStock = () => {
+		SellStock({
 			variables: { userId: props.userId, symbol: 'TEST', shares: 1 },
 		});
-	SellStock({
-		variables: { userId: props.userId, symbol: 'TEST', shares: 1 },
-	});
+	};
+
 	return (
 		<div>
 			<p>{props.user.email}</p>
+			<button onClick={sellStock}>Sell</button>
 		</div>
 	);
 };
