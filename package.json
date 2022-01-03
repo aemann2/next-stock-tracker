@@ -12,6 +12,7 @@
 		"@next-auth/prisma-adapter": "^0.5.2-next.19",
 		"@prisma/client": "^3.6.0",
 		"apollo-server-micro": "^3.5.0",
+		"axios": "^0.24.0",
 		"graphql": "^16.2.0",
 		"micro": "^9.3.4",
 		"micro-cors": "^0.1.1",

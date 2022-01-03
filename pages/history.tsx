@@ -26,18 +26,14 @@ const History: React.FC<IProps> = (props) => {
 	const { data, error, loading } = useQuery(TRANSACTIONS, {
 		variables: { userId: props.userId },
 	});
-	// const { transactions } = data;
-	loading && <p>Loading...</p>;
-	error && <p>Oops, something went wrong {error.message}</p>;
-	// console.log(data);
-	data && console.log(data);
+	if (loading) return <p>Loading...</p>;
+	if (error) return <p>Oops, something went wrong {error.message}</p>;
 	return (
 		<div>
 			<p>{props.user.email}</p>
-			{data &&
-				data.transactions.map((transaction: any, index: any) => (
-					<p key={index}>{transaction.symbol}</p>
-				))}
+			{data.transactions.map((transaction: any, index: any) => (
+				<p key={index}>{transaction.symbol}</p>
+			))}
 		</div>
 	);
 };
