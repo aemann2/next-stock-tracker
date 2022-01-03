@@ -6,13 +6,27 @@ import axios from 'axios';
 const Quote = () => {
 	const [stockPrice, setStockPrice] = useState(null);
 	const [stockSymbol, setStockSymbol] = useState('');
+	const [error, setError] = useState(false);
 
 	const getStock = async (symbol: string) => {
-		const res = await axios.get(
-			`https://cloud.iexapis.com/stable/stock/${symbol}/quote?token=${process.env.IEX_TOKEN}`
-		);
-		console.log(res);
-		setStockPrice(res.data.latestPrice);
+		let res = null;
+		setError(false);
+		try {
+			const apiRes = await axios.get(
+				`https://cloud.iexapis.com/stable/stock/${symbol}/quote?token=${process.env.IEX_TOKEN}`
+			);
+			res = apiRes.data;
+		} catch (err) {
+			console.log(err);
+			res = null;
+		} finally {
+			if (res) {
+				setStockPrice(res.latestPrice);
+			} else {
+				setStockPrice(null);
+				setError(true);
+			}
+		}
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +50,8 @@ const Quote = () => {
 				/>
 				<button type='submit'>Submit</button>
 			</form>
-			{stockPrice}
+			{stockPrice && <p>{stockPrice}</p>}
+			{error && <p>Error: That stock does not exist </p>}
 		</div>
 	);
 };
