@@ -13,7 +13,7 @@ const Quote = () => {
 		setError(false);
 		try {
 			const apiRes = await axios.get(
-				`https://cloud.iexapis.com/stable/stock/${symbol}/quote?token=${process.env.IEX_TOKEN}`
+				`https://cloud.iexapis.com/stable/stock/${symbol}/quote?token=${process.env.NEXT_PUBLIC_IEX_TOKEN}`
 			);
 			res = apiRes.data;
 		} catch (err) {

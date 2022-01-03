@@ -2,6 +2,6 @@
 module.exports = {
 	reactStrictMode: true,
 	env: {
-		IEX_TOKEN: process.env.IEX_TOKEN,
+		NEXT_PUBLIC_IEX_TOKEN: process.env.IEX_TOKEN,
 	},
 };
