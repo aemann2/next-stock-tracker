@@ -1,26 +1,13 @@
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { gql, useQuery } from '@apollo/client';
-
-const allUsersQuery = gql`
-	query {
-		users {
-			id
-			email
-			balance
-		}
-	}
-`;
 
 export default function Component() {
-	const { data: session } = useSession();
-	const { data, error, loading } = useQuery(allUsersQuery);
+	const { data: session, status } = useSession();
+
+	if (status === 'loading') {
+		return <p>Loading...</p>;
+	}
 
 	if (session) {
-		if (loading) return <p>Loading...</p>;
-
-		if (error) return <p>Oops, something went wrong {error.message}</p>;
-
-		console.log(data.users);
 		return (
 			<>
 				Signed in as {session.user.email} <br />
