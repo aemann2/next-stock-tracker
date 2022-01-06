@@ -1,13 +1,11 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
+import client from '../lib/apollo';
 import { getSession } from 'next-auth/react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 
 interface IProps {
-	user: {
-		email: string;
-	};
-	userId: string;
+	stocks: stock[];
 }
 
 interface stock {
@@ -24,16 +22,10 @@ const STOCKS = gql`
 	}
 `;
 
-const Home: React.FC<IProps> = (props) => {
-	const { data, error, loading } = useQuery(STOCKS, {
-		variables: { userId: props.userId },
-	});
-	if (loading) return <p>Loading...</p>;
-	if (error) return <p>Oops, something went wrong {error.message}</p>;
+const Home: React.FC<IProps> = ({ stocks }) => {
 	return (
 		<div>
-			<p>{props.user.email}</p>
-			{data.stocks.map((stock: stock, index: number) => (
+			{stocks.map((stock: stock, index: number) => (
 				<div key={index}>
 					<p>
 						{stock.symbol}, {stock.shares}
@@ -48,7 +40,15 @@ export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const session = await getSession(context);
-	const data = session!;
+	const userId = session!.userId;
+
+	const { data } = await client.query({
+		query: STOCKS,
+		variables: {
+			userId,
+		},
+	});
+
 	if (!session) {
 		return {
 			redirect: {
@@ -57,6 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			},
 		};
 	}
+
 	return {
 		props: data,
 	};
