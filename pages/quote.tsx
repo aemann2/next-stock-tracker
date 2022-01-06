@@ -8,6 +8,7 @@ const Quote = () => {
 	const [stockSymbol, setStockSymbol] = useState('');
 	const [error, setError] = useState(false);
 
+	// Todo: improve error handling for this section. Check out Academind 180.
 	const getStock = async (symbol: string) => {
 		let res = null;
 		setError(false);
