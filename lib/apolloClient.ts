@@ -16,10 +16,6 @@ const dev = process.env.NODE_ENV !== 'production';
 
 const server = dev ? 'http://localhost:3000' : process.env.BASE_URL;
 
-console.log(dev);
-console.log(process.env.NODE_ENV);
-console.log(server);
-
 function createApolloClient() {
 	return new ApolloClient({
 		ssrMode: typeof window === 'undefined',

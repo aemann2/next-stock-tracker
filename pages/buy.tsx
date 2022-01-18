@@ -32,15 +32,6 @@ const BUY_STOCK = gql`
 	}
 `;
 
-const dev = process.env.NODE_ENV !== 'production';
-
-const server = dev ? 'http://localhost:3000' : process.env.BASE_URL;
-
-console.log(dev);
-console.log(process.env.NODE_ENV);
-console.log(process.env.BASE_URL);
-console.log(process.env.EMAIL_SERVER);
-
 const Buy: React.FC<IProps> = (props) => {
 	const [BuyStock, { data: data, loading: loading, error: error }] =
 		useMutation(BUY_STOCK);
