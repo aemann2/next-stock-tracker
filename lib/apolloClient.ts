@@ -12,11 +12,15 @@ export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__';
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
 
+const dev = process.env.NODE_ENV !== 'production';
+
+const server = dev ? 'http://localhost:3000' : process.env.BASE_URL;
+
 function createApolloClient() {
 	return new ApolloClient({
 		ssrMode: typeof window === 'undefined',
 		link: new HttpLink({
-			uri: `http://localhost:3000/api/graphql`,
+			uri: `${server}/api/graphql`,
 			credentials: 'same-origin',
 		}),
 		cache: new InMemoryCache(),
