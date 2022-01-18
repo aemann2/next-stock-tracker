@@ -34,8 +34,8 @@ const Buy: React.FC<IProps> = (props) => {
 	const [SellStock, { data: data, loading: loading, error: error }] =
 		useMutation(SELL_STOCK);
 
-	const sellStock = () => {
-		SellStock({
+	const sellStock = async () => {
+		await SellStock({
 			variables: { userId: props.userId, symbol: 'TEST', shares: 1 },
 		});
 	};
