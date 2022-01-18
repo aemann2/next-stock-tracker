@@ -38,6 +38,7 @@ const server = dev ? 'http://localhost:3000' : process.env.BASE_URL;
 
 console.log(dev);
 console.log(process.env.NODE_ENV);
+console.log(process.env.BASE_URL);
 console.log(server);
 
 const Buy: React.FC<IProps> = (props) => {
