@@ -35,8 +35,8 @@ const BUY_STOCK = gql`
 const Buy: React.FC<IProps> = (props) => {
 	const [BuyStock, { data: data, loading: loading, error: error }] =
 		useMutation(BUY_STOCK);
-	const buyStock = () => {
-		BuyStock({
+	const buyStock = async () => {
+		await BuyStock({
 			variables: { userId: props.userId, symbol: 'TEST', shares: 99 },
 		});
 	};

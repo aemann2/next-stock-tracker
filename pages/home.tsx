@@ -1,11 +1,12 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
-import client from '../lib/apollo';
 import { getSession } from 'next-auth/react';
-import { gql } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
+import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
 interface IProps {
-	stocks: stock[];
+	email: string;
+	id: string;
 }
 
 interface stock {
@@ -22,10 +23,19 @@ const STOCKS = gql`
 	}
 `;
 
-const Home: React.FC<IProps> = ({ stocks }) => {
+const Home: React.FC<IProps> = (props) => {
+	const { email, id } = props;
+	const { loading, error, data } = useQuery(STOCKS, {
+		variables: {
+			userId: id,
+		},
+	});
+	if (loading) return <p>Loading...</p>;
+	if (error) return <p>Oops, something went wrong {error.message}</p>;
 	return (
 		<div>
-			{stocks.map((stock: stock, index: number) => (
+			<p>{email}</p>
+			{data.stocks.map((stock: stock, index: number) => (
 				<div key={index}>
 					<p>
 						{stock.symbol}, {stock.shares}
@@ -40,14 +50,8 @@ export default Home;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const session = await getSession(context);
-	const userId = session!.userId;
-
-	const { data } = await client.query({
-		query: STOCKS,
-		variables: {
-			userId,
-		},
-	});
+	const apolloClient = initializeApollo();
+	const user = session!;
 
 	if (!session) {
 		return {
@@ -58,7 +62,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		};
 	}
 
-	return {
-		props: data,
-	};
+	await apolloClient.query({
+		query: STOCKS,
+		variables: { userId: user.userId },
+	});
+
+	return addApolloState(apolloClient, {
+		props: {
+			id: user.userId,
+			email: user.user.email,
+		},
+	});
 };
