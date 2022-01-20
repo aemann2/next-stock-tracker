@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import axios from 'axios';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 
 interface IProps {
 	user: {
@@ -36,12 +36,36 @@ const BUY_STOCK = gql`
 	}
 `;
 
+const USER = gql`
+	query User($id: String!) {
+		user(id: $id) {
+			balance
+		}
+	}
+`;
+
 const Buy: React.FC<IProps> = (props) => {
 	const [stockSymbol, setStockSymbol] = useState('');
 	const [shares, setShares] = useState(1);
 	const [buyErr, setBuyErr] = useState<String | null>(null);
-	const [BuyStock, { data: data, loading: loading, error: reqErr }] =
-		useMutation(BUY_STOCK);
+
+	const [
+		BuyStock,
+		{ data: mutationData, loading: mutationLoading, error: reqErr },
+	] = useMutation(BUY_STOCK);
+
+	const {
+		loading: queryLoading,
+		error: queryErr,
+		data: queryData,
+		refetch: refetchBalance,
+	} = useQuery(USER, {
+		variables: {
+			id: props.userId,
+		},
+	});
+
+	queryData && console.log(queryData.user.balance);
 
 	const handleStockSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setStockSymbol(e.target.value);
@@ -68,6 +92,11 @@ const Buy: React.FC<IProps> = (props) => {
 			setBuyErr('Stock does not exist');
 		}
 
+		if (stockPrice * shares > queryData!.user.balance) {
+			setBuyErr('Insufficient funds');
+			return;
+		}
+
 		if (stockPrice) {
 			setBuyErr(null);
 			await BuyStock({
@@ -78,6 +107,7 @@ const Buy: React.FC<IProps> = (props) => {
 					shares: shares,
 				},
 			});
+			refetchBalance();
 		}
 	};
 	return (
@@ -96,7 +126,7 @@ const Buy: React.FC<IProps> = (props) => {
 					onChange={handleSharesChange}
 					value={shares}
 				/>
-				<button disabled={loading} onClick={buyStock}>
+				<button disabled={mutationLoading} onClick={buyStock}>
 					Buy
 				</button>
 			</form>

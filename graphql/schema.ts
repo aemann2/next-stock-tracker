@@ -31,7 +31,7 @@ export const typeDefs = gql`
 	}
 
 	type Query {
-		user(email: String): User
+		user(id: String): User
 		users: [User]
 		stocks(userId: String): [Stock]
 		stock(userId: String, symbol: String): [Stock]
