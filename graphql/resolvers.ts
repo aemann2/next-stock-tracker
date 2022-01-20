@@ -32,34 +32,25 @@ export const resolvers = {
 			}),
 	},
 	Mutation: {
-		addStock: async (_parent: any, args: any, ctx: Context) => {
-			const stock = await ctx.prisma.stock.findMany({
+		addStock: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.stock.upsert({
 				where: {
-					userId: args.userId,
-					symbol: args.symbol,
-				},
-			});
-			if (stock[0]) {
-				await ctx.prisma.stock.update({
-					where: {
-						id: stock[0].id,
-					},
-					data: {
-						shares: {
-							increment: args.shares,
-						},
-					},
-				});
-			} else {
-				await ctx.prisma.stock.create({
-					data: {
+					userStockId: {
 						userId: args.userId,
 						symbol: args.symbol,
-						shares: args.shares,
 					},
-				});
-			}
-		},
+				},
+				update: {
+					shares: {
+						increment: args.shares,
+					},
+				},
+				create: {
+					userId: args.userId,
+					symbol: args.symbol,
+					shares: args.shares,
+				},
+			}),
 		addTransaction: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.transaction.create({
 				data: {
@@ -72,10 +63,12 @@ export const resolvers = {
 				},
 			}),
 		modifyStock: async (_parent: any, args: any, ctx: Context) =>
-			await ctx.prisma.stock.updateMany({
+			await ctx.prisma.stock.update({
 				where: {
-					userId: args.userId,
-					symbol: args.symbol,
+					userStockId: {
+						userId: args.userId,
+						symbol: args.symbol,
+					},
 				},
 				data: {
 					shares: args.shares,
@@ -93,7 +86,10 @@ export const resolvers = {
 		deleteStock: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.stock.delete({
 				where: {
-					id: args.id,
+					userStockId: {
+						userId: args.userId,
+						symbol: args.symbol,
+					},
 				},
 			}),
 	},
