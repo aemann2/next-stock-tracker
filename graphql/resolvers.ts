@@ -1,3 +1,4 @@
+import { prisma } from '@prisma/client';
 import { Context } from './context';
 
 export const resolvers = {
@@ -16,6 +17,13 @@ export const resolvers = {
 					userId: args.userId,
 				},
 			}),
+		stock: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.stock.findMany({
+				where: {
+					userId: args.userId,
+					symbol: args.symbol,
+				},
+			}),
 		transactions: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.transaction.findMany({
 				where: {
@@ -24,14 +32,34 @@ export const resolvers = {
 			}),
 	},
 	Mutation: {
-		addStock: async (_parent: any, args: any, ctx: Context) =>
-			await ctx.prisma.stock.create({
-				data: {
+		addStock: async (_parent: any, args: any, ctx: Context) => {
+			const stock = await ctx.prisma.stock.findMany({
+				where: {
 					userId: args.userId,
 					symbol: args.symbol,
-					shares: args.shares,
 				},
-			}),
+			});
+			if (stock[0]) {
+				await ctx.prisma.stock.update({
+					where: {
+						id: stock[0].id,
+					},
+					data: {
+						shares: {
+							increment: args.shares,
+						},
+					},
+				});
+			} else {
+				await ctx.prisma.stock.create({
+					data: {
+						userId: args.userId,
+						symbol: args.symbol,
+						shares: args.shares,
+					},
+				});
+			}
+		},
 		addTransaction: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.transaction.create({
 				data: {

@@ -10,6 +10,7 @@ export const typeDefs = gql`
 	}
 
 	type Stock {
+		id: String
 		userId: String
 		symbol: String
 		shares: Int
@@ -33,6 +34,7 @@ export const typeDefs = gql`
 		user(email: String): User
 		users: [User]
 		stocks(userId: String): [Stock]
+		stock(userId: String, symbol: String): [Stock]
 		transactions(userId: String): [Transaction]
 	}
 
