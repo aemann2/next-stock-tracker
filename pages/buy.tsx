@@ -43,7 +43,10 @@ const Buy: React.FC<IProps> = (props) => {
 	return (
 		<div>
 			<p>{props.user.email}</p>
-			<button onClick={buyStock}>Buy</button>
+			<button disabled={loading} onClick={buyStock}>
+				Buy
+			</button>
+			{error && <p>Error: {error}</p>}
 		</div>
 	);
 };
