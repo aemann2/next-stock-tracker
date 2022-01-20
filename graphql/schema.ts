@@ -52,7 +52,7 @@ export const typeDefs = gql`
 
 		modifyStock(userId: String!, symbol: String!, shares: Int!): Stock
 
-		modifyUser(id: String!, price: Float!): User
+		modifyUser(id: String!, price: Float!, shares: Int!): User
 
 		deleteStock(id: Int!): Stock
 	}
