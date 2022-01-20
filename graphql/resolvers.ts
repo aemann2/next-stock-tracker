@@ -80,7 +80,9 @@ export const resolvers = {
 					id: args.id,
 				},
 				data: {
-					balance: args.balance,
+					balance: {
+						increment: -args.price,
+					},
 				},
 			}),
 		deleteStock: async (_parent: any, args: any, ctx: Context) =>

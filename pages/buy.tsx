@@ -10,8 +10,6 @@ interface IProps {
 	userId: string;
 }
 
-// I should use upsert here in case the user already has a stock
-
 const BUY_STOCK = gql`
 	mutation BuyStock($userId: String!, $shares: Int!, $symbol: String!) {
 		addTransaction(
@@ -26,7 +24,7 @@ const BUY_STOCK = gql`
 		addStock(userId: $userId, symbol: $symbol, shares: $shares) {
 			userId
 		}
-		modifyUser(id: $userId, balance: 9938.23) {
+		modifyUser(id: $userId, price: 48.39) {
 			id
 		}
 	}
