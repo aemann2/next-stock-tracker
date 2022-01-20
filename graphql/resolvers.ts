@@ -81,7 +81,7 @@ export const resolvers = {
 				},
 				data: {
 					balance: {
-						increment: -(args.price * args.shares),
+						increment: -args.price,
 					},
 				},
 			}),
