@@ -12,6 +12,7 @@ const cors = Cors();
 const apolloServer = new ApolloServer({
 	typeDefs,
 	resolvers,
+	introspection: process.env.NODE_ENV !== 'production',
 	context: createContext,
 });
 
