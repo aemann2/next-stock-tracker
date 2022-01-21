@@ -35,8 +35,6 @@ export const resolvers = {
 		addStock: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.stock.upsert({
 				where: {
-					// TO FIX: This causes a build error
-					//@ts-ignore
 					userStockId: {
 						userId: args.userId,
 						symbol: args.symbol,
@@ -67,8 +65,6 @@ export const resolvers = {
 		modifyStock: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.stock.update({
 				where: {
-					// TO FIX: This causes a build error
-					//@ts-ignore
 					userStockId: {
 						userId: args.userId,
 						symbol: args.symbol,
@@ -92,8 +88,6 @@ export const resolvers = {
 		deleteStock: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.stock.delete({
 				where: {
-					// TO FIX: This causes a build error
-					//@ts-ignore
 					userStockId: {
 						userId: args.userId,
 						symbol: args.symbol,
