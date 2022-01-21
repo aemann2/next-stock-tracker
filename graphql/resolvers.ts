@@ -1,3 +1,4 @@
+import { prisma } from '@prisma/client';
 import { Context } from './context';
 
 export const resolvers = {
@@ -7,13 +8,20 @@ export const resolvers = {
 		user: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.user.findUnique({
 				where: {
-					email: args.email,
+					id: args.id,
 				},
 			}),
 		stocks: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.stock.findMany({
 				where: {
 					userId: args.userId,
+				},
+			}),
+		stock: async (_parent: any, args: any, ctx: Context) =>
+			await ctx.prisma.stock.findMany({
+				where: {
+					userId: args.userId,
+					symbol: args.symbol,
 				},
 			}),
 		transactions: async (_parent: any, args: any, ctx: Context) =>
@@ -25,8 +33,19 @@ export const resolvers = {
 	},
 	Mutation: {
 		addStock: async (_parent: any, args: any, ctx: Context) =>
-			await ctx.prisma.stock.create({
-				data: {
+			await ctx.prisma.stock.upsert({
+				where: {
+					userStockId: {
+						userId: args.userId,
+						symbol: args.symbol,
+					},
+				},
+				update: {
+					shares: {
+						increment: args.shares,
+					},
+				},
+				create: {
 					userId: args.userId,
 					symbol: args.symbol,
 					shares: args.shares,
@@ -44,10 +63,12 @@ export const resolvers = {
 				},
 			}),
 		modifyStock: async (_parent: any, args: any, ctx: Context) =>
-			await ctx.prisma.stock.updateMany({
+			await ctx.prisma.stock.update({
 				where: {
-					userId: args.userId,
-					symbol: args.symbol,
+					userStockId: {
+						userId: args.userId,
+						symbol: args.symbol,
+					},
 				},
 				data: {
 					shares: args.shares,
@@ -59,13 +80,18 @@ export const resolvers = {
 					id: args.id,
 				},
 				data: {
-					balance: args.balance,
+					balance: {
+						increment: -args.price,
+					},
 				},
 			}),
 		deleteStock: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.stock.delete({
 				where: {
-					id: args.id,
+					userStockId: {
+						userId: args.userId,
+						symbol: args.symbol,
+					},
 				},
 			}),
 	},

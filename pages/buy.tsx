@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { gql, useMutation } from '@apollo/client';
+import axios from 'axios';
+import { gql, useMutation, useQuery } from '@apollo/client';
 
 interface IProps {
 	user: {
@@ -10,15 +11,18 @@ interface IProps {
 	userId: string;
 }
 
-// I should use upsert here in case the user already has a stock
-
 const BUY_STOCK = gql`
-	mutation BuyStock($userId: String!, $shares: Int!, $symbol: String!) {
+	mutation BuyStock(
+		$userId: String!
+		$shares: Int!
+		$symbol: String!
+		$price: Float!
+	) {
 		addTransaction(
 			userId: $userId
 			symbol: $symbol
 			shares: $shares
-			price: 48.39
+			price: $price
 			transType: BUY
 		) {
 			userId
@@ -26,24 +30,108 @@ const BUY_STOCK = gql`
 		addStock(userId: $userId, symbol: $symbol, shares: $shares) {
 			userId
 		}
-		modifyUser(id: $userId, balance: 9938.23) {
+		modifyUser(id: $userId, price: $price, shares: $shares) {
 			id
 		}
 	}
 `;
 
+const USER = gql`
+	query User($id: String!) {
+		user(id: $id) {
+			balance
+		}
+	}
+`;
+
 const Buy: React.FC<IProps> = (props) => {
-	const [BuyStock, { data: data, loading: loading, error: error }] =
-		useMutation(BUY_STOCK);
+	const [stockSymbol, setStockSymbol] = useState('');
+	const [shares, setShares] = useState(1);
+	const [buyErr, setBuyErr] = useState<String | null>(null);
+
+	const [
+		BuyStock,
+		{ data: mutationData, loading: mutationLoading, error: reqErr },
+	] = useMutation(BUY_STOCK);
+
+	const {
+		loading: queryLoading,
+		error: queryErr,
+		data: queryData,
+		refetch: refetchBalance,
+	} = useQuery(USER, {
+		variables: {
+			id: props.userId,
+		},
+	});
+
+	queryData && console.log(queryData.user.balance);
+
+	const handleStockSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setStockSymbol(e.target.value);
+	};
+
+	const handleSharesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setShares(Number(e.target.value));
+	};
+
+	const handleSumit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setShares(1);
+	};
+
 	const buyStock = async () => {
-		await BuyStock({
-			variables: { userId: props.userId, symbol: 'TEST', shares: 99 },
-		});
+		let stockPrice;
+
+		try {
+			const res = await axios.get(
+				`https://cloud.iexapis.com/stable/stock/${stockSymbol}/quote?token=${process.env.NEXT_PUBLIC_IEX_TOKEN}`
+			);
+			stockPrice = res.data.latestPrice;
+		} catch (error) {
+			setBuyErr('Stock does not exist');
+		}
+
+		if (stockPrice * shares > queryData!.user.balance) {
+			setBuyErr('Insufficient funds');
+			return;
+		}
+
+		if (stockPrice) {
+			setBuyErr(null);
+			await BuyStock({
+				variables: {
+					userId: props.userId,
+					symbol: stockSymbol,
+					price: stockPrice * shares,
+					shares: shares,
+				},
+			});
+			refetchBalance();
+		}
 	};
 	return (
 		<div>
 			<p>{props.user.email}</p>
-			<button onClick={buyStock}>Buy</button>
+			<form onSubmit={handleSumit}>
+				<input
+					placeholder='Symbol'
+					onChange={handleStockSymbolChange}
+					value={stockSymbol}
+				/>
+				<input
+					placeholder='Shares'
+					type='number'
+					min='1'
+					onChange={handleSharesChange}
+					value={shares}
+				/>
+				<button disabled={mutationLoading} onClick={buyStock}>
+					Buy
+				</button>
+			</form>
+			{buyErr && <p>Error: {buyErr}</p>}
+			{reqErr && <p>Error: {reqErr}</p>}
 		</div>
 	);
 };

@@ -12,6 +12,7 @@ model Stock {
   userId String
   symbol  String
   shares  Int
+  @@unique(fields: [userId, symbol], name: "userStockId")
   user   User  @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 

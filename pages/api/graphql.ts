@@ -1,4 +1,5 @@
 import { ApolloServer } from 'apollo-server-micro';
+import { ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
 import { typeDefs } from '../../graphql/schema';
 import { resolvers } from '../../graphql/resolvers';
 import { createContext } from '../../graphql/context';
@@ -12,6 +13,11 @@ const cors = Cors();
 const apolloServer = new ApolloServer({
 	typeDefs,
 	resolvers,
+	introspection: process.env.NODE_ENV !== 'production',
+	plugins:
+		process.env.NODE_ENV === 'production'
+			? [ApolloServerPluginLandingPageDisabled()]
+			: undefined,
 	context: createContext,
 });
 

@@ -10,6 +10,7 @@ export const typeDefs = gql`
 	}
 
 	type Stock {
+		id: String
 		userId: String
 		symbol: String
 		shares: Int
@@ -30,9 +31,10 @@ export const typeDefs = gql`
 	}
 
 	type Query {
-		user(email: String): User
+		user(id: String): User
 		users: [User]
 		stocks(userId: String): [Stock]
+		stock(userId: String, symbol: String): [Stock]
 		transactions(userId: String): [Transaction]
 	}
 
@@ -50,7 +52,7 @@ export const typeDefs = gql`
 
 		modifyStock(userId: String!, symbol: String!, shares: Int!): Stock
 
-		modifyUser(id: String!, balance: Float!): User
+		modifyUser(id: String!, price: Float!, shares: Int!): User
 
 		deleteStock(id: Int!): Stock
 	}
