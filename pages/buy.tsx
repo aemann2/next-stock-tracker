@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import axios from 'axios';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { BUY_STOCK, USER } from '../queries';
+import { useMutation, useQuery } from '@apollo/client';
 
 interface IProps {
 	user: {
@@ -10,39 +11,6 @@ interface IProps {
 	};
 	userId: string;
 }
-
-const BUY_STOCK = gql`
-	mutation BuyStock(
-		$userId: String!
-		$shares: Int!
-		$symbol: String!
-		$price: Float!
-	) {
-		addTransaction(
-			userId: $userId
-			symbol: $symbol
-			shares: $shares
-			price: $price
-			transType: BUY
-		) {
-			userId
-		}
-		addStock(userId: $userId, symbol: $symbol, shares: $shares) {
-			userId
-		}
-		modifyUser(id: $userId, price: $price, shares: $shares) {
-			id
-		}
-	}
-`;
-
-const USER = gql`
-	query User($id: String!) {
-		user(id: $id) {
-			balance
-		}
-	}
-`;
 
 const Buy: React.FC<IProps> = (props) => {
 	const [stockSymbol, setStockSymbol] = useState('');

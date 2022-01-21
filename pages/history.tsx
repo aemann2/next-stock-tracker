@@ -1,7 +1,8 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { gql, useQuery } from '@apollo/client';
+import { GET_TRANSACTIONS } from '../queries';
+import { useQuery } from '@apollo/client';
 import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
 interface IProps {
@@ -9,21 +10,9 @@ interface IProps {
 	id: string;
 }
 
-const TRANSACTIONS = gql`
-	query Transactions($userId: String!) {
-		transactions(userId: $userId) {
-			symbol
-			shares
-			price
-			transType
-			transacted
-		}
-	}
-`;
-
 const History: React.FC<IProps> = (props) => {
 	const { email, id } = props;
-	const { loading, error, data } = useQuery(TRANSACTIONS, {
+	const { loading, error, data } = useQuery(GET_TRANSACTIONS, {
 		variables: {
 			userId: id,
 		},
@@ -57,7 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	}
 
 	await apolloClient.query({
-		query: TRANSACTIONS,
+		query: GET_TRANSACTIONS,
 		variables: { userId: user.userId },
 	});
 

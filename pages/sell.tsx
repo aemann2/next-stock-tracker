@@ -1,7 +1,8 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { gql, useMutation } from '@apollo/client';
+import { SELL_STOCK } from '../queries';
+import { useMutation } from '@apollo/client';
 
 interface IProps {
 	user: {
@@ -9,26 +10,6 @@ interface IProps {
 	};
 	userId: string;
 }
-
-const SELL_STOCK = gql`
-	mutation SellStock($userId: String!, $shares: Int!, $symbol: String!) {
-		addTransaction(
-			userId: $userId
-			symbol: $symbol
-			shares: $shares
-			price: 48.39
-			transType: SELL
-		) {
-			userId
-		}
-		modifyUser(id: $userId, balance: 10430.23) {
-			id
-		}
-		modifyStock(userId: $userId, symbol: $symbol, shares: $shares) {
-			userId
-		}
-	}
-`;
 
 const Buy: React.FC<IProps> = (props) => {
 	const [SellStock, { data: data, loading: loading, error: error }] =
