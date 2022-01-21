@@ -14,6 +14,7 @@ export const typeDefs = gql`
 		userId: String
 		symbol: String
 		shares: Int
+		userStockId: userStockId
 	}
 
 	type Transaction {
@@ -28,6 +29,11 @@ export const typeDefs = gql`
 	enum transType {
 		BUY
 		SELL
+	}
+
+	type userStockId {
+		userId: String
+		shares: String
 	}
 
 	type Query {
