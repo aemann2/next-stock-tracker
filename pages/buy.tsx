@@ -4,6 +4,7 @@ import { getSession } from 'next-auth/react';
 import axios from 'axios';
 import { BUY_STOCK, USER } from '../queries';
 import { useMutation, useQuery } from '@apollo/client';
+import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
 interface IProps {
 	user: {
@@ -108,7 +109,9 @@ export default Buy;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const session = await getSession(context);
-	const data = session!;
+	const user = session!;
+	const apolloClient = initializeApollo();
+
 	if (!session) {
 		return {
 			redirect: {
@@ -117,7 +120,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			},
 		};
 	}
-	return {
-		props: data,
-	};
+
+	await apolloClient.query({
+		query: USER,
+		variables: { id: user.userId },
+	});
+
+	return addApolloState(apolloClient, {
+		props: user,
+	});
 };
