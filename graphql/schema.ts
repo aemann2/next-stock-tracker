@@ -14,6 +14,10 @@ export const typeDefs = gql`
 		userId: String
 		symbol: String
 		shares: Int
+		userStockId: {
+			userId: String,
+			symbol: String
+		}
 	}
 
 	type Transaction {
