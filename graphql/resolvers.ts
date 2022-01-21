@@ -35,6 +35,7 @@ export const resolvers = {
 		addStock: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.stock.upsert({
 				where: {
+					//@ts-ignore
 					userStockId: {
 						userId: args.userId,
 						symbol: args.symbol,
@@ -65,6 +66,7 @@ export const resolvers = {
 		modifyStock: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.stock.update({
 				where: {
+					//@ts-ignore
 					userStockId: {
 						userId: args.userId,
 						symbol: args.symbol,
@@ -88,6 +90,7 @@ export const resolvers = {
 		deleteStock: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.stock.delete({
 				where: {
+					//@ts-ignore
 					userStockId: {
 						userId: args.userId,
 						symbol: args.symbol,
