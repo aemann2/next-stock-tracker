@@ -13,9 +13,7 @@ const Quote = () => {
 		let res = null;
 		setError(false);
 		try {
-			const apiRes = await axios.get(
-				`https://cloud.iexapis.com/stable/stock/${symbol}/quote?token=${process.env.NEXT_PUBLIC_IEX_TOKEN}`
-			);
+			const apiRes = await axios.get(`api/stockquote?symbol=${symbol}`);
 			res = apiRes.data;
 		} catch (err) {
 			console.log(err);

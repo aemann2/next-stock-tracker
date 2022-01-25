@@ -28,6 +28,7 @@
 		"seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
 	},
 	"devDependencies": {
+		"@types/express": "^4.17.13",
 		"@types/lodash": "^4.14.178",
 		"@types/micro-cors": "^0.1.2",
 		"@types/node": "16.11.12",
