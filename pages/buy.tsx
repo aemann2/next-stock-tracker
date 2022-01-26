@@ -34,8 +34,6 @@ const Buy: React.FC<IProps> = (props) => {
 		},
 	});
 
-	queryData && console.log(queryData.user.balance);
-
 	const handleStockSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setStockSymbol(e.target.value);
 	};

@@ -64,7 +64,7 @@ export const resolvers = {
 					transacted: new Date('2021-03-19T14:21:00+0200'),
 				},
 			}),
-		modifyStock: async (_parent: any, args: any, ctx: Context) =>
+		removeStock: async (_parent: any, args: any, ctx: Context) =>
 			await ctx.prisma.stock.update({
 				where: {
 					// TO FIX: This causes a build error
@@ -75,7 +75,9 @@ export const resolvers = {
 					},
 				},
 				data: {
-					shares: args.shares,
+					shares: {
+						increment: -args.shares,
+					},
 				},
 			}),
 		modifyUser: async (_parent: any, args: any, ctx: Context) =>

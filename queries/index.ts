@@ -47,21 +47,26 @@ export const BUY_STOCK = gql`
 `;
 
 export const SELL_STOCK = gql`
-	mutation SellStock($userId: String!, $shares: Int!, $symbol: String!) {
+	mutation SellStock(
+		$userId: String!
+		$shares: Int!
+		$symbol: String!
+		$price: Float!
+	) {
 		addTransaction(
 			userId: $userId
 			symbol: $symbol
 			shares: $shares
-			price: 48.39
+			price: $price
 			transType: SELL
 		) {
 			userId
 		}
-		modifyUser(id: $userId, balance: 10430.23) {
-			id
-		}
-		modifyStock(userId: $userId, symbol: $symbol, shares: $shares) {
+		removeStock(userId: $userId, symbol: $symbol, shares: $shares) {
 			userId
+		}
+		modifyUser(id: $userId, price: 1.00, shares: $shares) {
+			id
 		}
 	}
 `;
