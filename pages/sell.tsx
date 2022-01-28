@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
-import { SELL_STOCK, USER } from '../queries';
+import { SELL_STOCK, GET_STOCKS } from '../queries';
 import { useMutation, useQuery } from '@apollo/client';
 import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
@@ -13,9 +13,14 @@ interface IProps {
 	userId: string;
 }
 
+interface stock {
+	symbol: string;
+	shares: number;
+}
+
 const Sell: React.FC<IProps> = (props) => {
-	const [stockSymbol, setStockSymbol] = useState('');
-	const [shares, setShares] = useState(1);
+	const [stockSymbol, setStockSymbol] = useState<string>();
+	const [sharesToSell, setSharesToSell] = useState(1);
 	const [sellErr, setSellErr] = useState<String | null>(null);
 
 	const [
@@ -27,41 +32,46 @@ const Sell: React.FC<IProps> = (props) => {
 		loading: queryLoading,
 		error: queryErr,
 		data: queryData,
-		refetch: refetchBalance,
-	} = useQuery(USER, {
+		refetch: refetchStocks,
+	} = useQuery(GET_STOCKS, {
 		variables: {
-			id: props.userId,
+			userId: props.userId,
 		},
 	});
 
-	const handleStockSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	useEffect(() => {
+		if (queryData) {
+			setStockSymbol(queryData.stocks[0].symbol);
+		}
+	}, [queryData]);
+
+	const handleStockSymbolChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setStockSymbol(e.target.value);
 	};
 
 	const handleSharesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setShares(Number(e.target.value));
+		setSharesToSell(Number(e.target.value));
 	};
 
 	const handleSumit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		setShares(1);
+		setSharesToSell(1);
 	};
 
 	const sellStock = async () => {
 		let stockPrice;
 
-		try {
-			const res = await axios.get(`api/stockquote?symbol=${stockSymbol}`);
-			stockPrice = res.data.latestPrice;
-		} catch (error) {
-			setSellErr('Stock does not exist');
-		}
+		const res = await axios.get(`api/stockquote?symbol=${stockSymbol}`);
+		stockPrice = res.data.latestPrice;
 
-		// TODO: add logic for if user doesn't have enough shares
-		// if (stockPrice * shares > queryData!.user.balance) {
-		// 	setSellErr('Insufficient funds');
-		// 	return;
-		// }
+		const userStockData = queryData.stocks.find(
+			(stock: stock) => stock.symbol === stockSymbol
+		);
+
+		if (sharesToSell > userStockData.shares) {
+			setSellErr("You don't own enough stock");
+			return;
+		}
 
 		if (stockPrice) {
 			setSellErr(null);
@@ -69,11 +79,11 @@ const Sell: React.FC<IProps> = (props) => {
 				variables: {
 					userId: props.userId,
 					symbol: stockSymbol,
-					price: stockPrice * shares,
-					shares: shares,
+					price: stockPrice * sharesToSell,
+					shares: sharesToSell,
 				},
 			});
-			refetchBalance();
+			refetchStocks();
 		}
 	};
 
@@ -81,24 +91,31 @@ const Sell: React.FC<IProps> = (props) => {
 		<div>
 			<p>{props.user.email}</p>
 			<form onSubmit={handleSumit}>
-				<input
-					placeholder='Symbol'
+				<select
+					name='stocks'
+					value={stockSymbol || queryData.stocks[0]}
 					onChange={handleStockSymbolChange}
-					value={stockSymbol}
-				/>
+				>
+					{queryData.stocks.map((stock: any) => {
+						return (
+							<option key={stock.symbol} value={stock.symbol}>
+								{stock.symbol} : {stock.shares}
+							</option>
+						);
+					})}
+				</select>
 				<input
 					placeholder='Shares'
 					type='number'
 					min='1'
 					onChange={handleSharesChange}
-					value={shares}
+					value={sharesToSell}
 				/>
 				<button disabled={mutationLoading} onClick={sellStock}>
 					Sell
 				</button>
 			</form>
-			{/* {sellErr && <p>Error: {sellErr}</p>}
-			{reqErr && <p>Error: {reqErr}</p>} */}
+			{sellErr && <p>Error: {sellErr}</p>}
 		</div>
 	);
 };
@@ -119,8 +136,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	}
 
 	await apolloClient.query({
-		query: USER,
-		variables: { id: user.userId },
+		query: GET_STOCKS,
+		variables: { userId: user.userId },
 	});
 
 	return addApolloState(apolloClient, {
