@@ -52,7 +52,9 @@ const Buy: React.FC<IProps> = (props) => {
 
 		try {
 			const res = await axios.get(
-				`https://cloud.iexapis.com/stable/stock/${stockSymbol}/quote?token=${process.env.NEXT_PUBLIC_IEX_TOKEN}`
+				`https://cloud.iexapis.com/stable/stock/${stockSymbol.toUpperCase()}/quote?token=${
+					process.env.NEXT_PUBLIC_IEX_TOKEN
+				}`
 			);
 			stockPrice = res.data.latestPrice;
 		} catch (error) {

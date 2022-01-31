@@ -61,7 +61,6 @@ export const resolvers = {
 					shares: args.shares,
 					price: args.price,
 					transType: args.transType,
-					transacted: new Date('2021-03-19T14:21:00+0200'),
 				},
 			}),
 		removeStock: async (_parent: any, args: any, ctx: Context) =>
