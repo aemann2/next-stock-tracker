@@ -70,7 +70,7 @@ const Buy: React.FC<IProps> = (props) => {
 				variables: {
 					userId: props.userId,
 					symbol: stockSymbol,
-					price: stockPrice * shares,
+					price: -1 * (stockPrice * shares),
 					shares: shares,
 				},
 			});

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
-import { SELL_STOCK, GET_STOCKS } from '../queries';
+import { SELL_STOCK, REMOVE_STOCK, GET_STOCKS } from '../queries';
 import { useMutation, useQuery } from '@apollo/client';
 import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
@@ -27,6 +27,15 @@ const Sell: React.FC<IProps> = (props) => {
 		SellStock,
 		{ data: mutationData, loading: mutationLoading, error: reqErr },
 	] = useMutation(SELL_STOCK);
+
+	const [
+		RemoveStock,
+		{
+			data: mutationDataRemove,
+			loading: mutationLoadingRemove,
+			error: reqErrRemove,
+		},
+	] = useMutation(REMOVE_STOCK);
 
 	const {
 		loading: queryLoading,
@@ -73,6 +82,20 @@ const Sell: React.FC<IProps> = (props) => {
 			return;
 		}
 
+		if (stockPrice && sharesToSell === userStockData.shares) {
+			setSellErr(null);
+			await RemoveStock({
+				variables: {
+					userId: props.userId,
+					symbol: stockSymbol,
+					price: stockPrice * sharesToSell,
+					shares: sharesToSell,
+				},
+			});
+			refetchStocks();
+			return;
+		}
+
 		if (stockPrice) {
 			setSellErr(null);
 			await SellStock({
@@ -111,7 +134,10 @@ const Sell: React.FC<IProps> = (props) => {
 					onChange={handleSharesChange}
 					value={sharesToSell}
 				/>
-				<button disabled={mutationLoading} onClick={sellStock}>
+				<button
+					disabled={mutationLoading || mutationLoadingRemove}
+					onClick={sellStock}
+				>
 					Sell
 				</button>
 			</form>

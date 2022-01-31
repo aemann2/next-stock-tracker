@@ -65,7 +65,32 @@ export const SELL_STOCK = gql`
 		removeStock(userId: $userId, symbol: $symbol, shares: $shares) {
 			userId
 		}
-		modifyUser(id: $userId, price: 1.00, shares: $shares) {
+		modifyUser(id: $userId, price: $price, shares: $shares) {
+			id
+		}
+	}
+`;
+
+export const REMOVE_STOCK = gql`
+	mutation RemoveStock(
+		$userId: String!
+		$shares: Int!
+		$symbol: String!
+		$price: Float!
+	) {
+		addTransaction(
+			userId: $userId
+			symbol: $symbol
+			shares: $shares
+			price: $price
+			transType: SELL
+		) {
+			userId
+		}
+		deleteStock(userId: $userId, symbol: $symbol) {
+			userId
+		}
+		modifyUser(id: $userId, price: $price, shares: $shares) {
 			id
 		}
 	}
