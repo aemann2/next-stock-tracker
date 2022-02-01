@@ -1,7 +1,8 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { gql, useQuery } from '@apollo/client';
+import { GET_TRANSACTIONS } from '../queries';
+import { useQuery } from '@apollo/client';
 import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
 interface IProps {
@@ -9,32 +10,29 @@ interface IProps {
 	id: string;
 }
 
-const TRANSACTIONS = gql`
-	query Transactions($userId: String!) {
-		transactions(userId: $userId) {
-			symbol
-			shares
-			price
-			transType
-			transacted
-		}
-	}
-`;
-
 const History: React.FC<IProps> = (props) => {
 	const { email, id } = props;
-	const { loading, error, data } = useQuery(TRANSACTIONS, {
+	const { loading, error, data } = useQuery(GET_TRANSACTIONS, {
 		variables: {
 			userId: id,
 		},
 	});
+	console.log(data.transactions[0].transacted);
+	console.log(new Date(1643666443555));
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Oops, something went wrong {error.message}</p>;
 	return (
 		<div>
 			<p>{email}</p>
 			{data.transactions.map((transaction: any, index: any) => (
-				<p key={index}>{transaction.symbol}</p>
+				<div key={index}>
+					<span>{transaction.symbol}</span> | <span>{transaction.shares}</span>{' '}
+					| <span>{transaction.price}</span> |{' '}
+					<span>{transaction.transType}</span> |{' '}
+					<span>
+						{new Date(Number(transaction.transacted)).toLocaleString()}
+					</span>
+				</div>
 			))}
 		</div>
 	);
@@ -57,7 +55,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	}
 
 	await apolloClient.query({
-		query: TRANSACTIONS,
+		query: GET_TRANSACTIONS,
 		variables: { userId: user.userId },
 	});
 

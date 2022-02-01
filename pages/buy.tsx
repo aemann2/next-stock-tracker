@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import axios from 'axios';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { BUY_STOCK, USER } from '../queries';
+import { useMutation, useQuery } from '@apollo/client';
+import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
 interface IProps {
 	user: {
@@ -10,39 +12,6 @@ interface IProps {
 	};
 	userId: string;
 }
-
-const BUY_STOCK = gql`
-	mutation BuyStock(
-		$userId: String!
-		$shares: Int!
-		$symbol: String!
-		$price: Float!
-	) {
-		addTransaction(
-			userId: $userId
-			symbol: $symbol
-			shares: $shares
-			price: $price
-			transType: BUY
-		) {
-			userId
-		}
-		addStock(userId: $userId, symbol: $symbol, shares: $shares) {
-			userId
-		}
-		modifyUser(id: $userId, price: $price, shares: $shares) {
-			id
-		}
-	}
-`;
-
-const USER = gql`
-	query User($id: String!) {
-		user(id: $id) {
-			balance
-		}
-	}
-`;
 
 const Buy: React.FC<IProps> = (props) => {
 	const [stockSymbol, setStockSymbol] = useState('');
@@ -65,8 +34,6 @@ const Buy: React.FC<IProps> = (props) => {
 		},
 	});
 
-	queryData && console.log(queryData.user.balance);
-
 	const handleStockSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setStockSymbol(e.target.value);
 	};
@@ -85,7 +52,9 @@ const Buy: React.FC<IProps> = (props) => {
 
 		try {
 			const res = await axios.get(
-				`https://cloud.iexapis.com/stable/stock/${stockSymbol}/quote?token=${process.env.NEXT_PUBLIC_IEX_TOKEN}`
+				`https://cloud.iexapis.com/stable/stock/${stockSymbol.toUpperCase()}/quote?token=${
+					process.env.NEXT_PUBLIC_IEX_TOKEN
+				}`
 			);
 			stockPrice = res.data.latestPrice;
 		} catch (error) {
@@ -103,7 +72,7 @@ const Buy: React.FC<IProps> = (props) => {
 				variables: {
 					userId: props.userId,
 					symbol: stockSymbol,
-					price: stockPrice * shares,
+					price: -1 * (stockPrice * shares),
 					shares: shares,
 				},
 			});
@@ -140,7 +109,9 @@ export default Buy;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const session = await getSession(context);
-	const data = session!;
+	const user = session!;
+	const apolloClient = initializeApollo();
+
 	if (!session) {
 		return {
 			redirect: {
@@ -149,7 +120,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			},
 		};
 	}
-	return {
-		props: data,
-	};
+
+	await apolloClient.query({
+		query: USER,
+		variables: { id: user.userId },
+	});
+
+	return addApolloState(apolloClient, {
+		props: user,
+	});
 };

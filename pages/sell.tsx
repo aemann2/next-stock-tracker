@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
+import axios from 'axios';
 import { getSession } from 'next-auth/react';
-import { gql, useMutation } from '@apollo/client';
+import { SELL_STOCK, REMOVE_STOCK, GET_STOCKS } from '../queries';
+import { useMutation, useQuery } from '@apollo/client';
+import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
 interface IProps {
 	user: {
@@ -10,49 +13,145 @@ interface IProps {
 	userId: string;
 }
 
-const SELL_STOCK = gql`
-	mutation SellStock($userId: String!, $shares: Int!, $symbol: String!) {
-		addTransaction(
-			userId: $userId
-			symbol: $symbol
-			shares: $shares
-			price: 48.39
-			transType: SELL
-		) {
-			userId
-		}
-		modifyUser(id: $userId, balance: 10430.23) {
-			id
-		}
-		modifyStock(userId: $userId, symbol: $symbol, shares: $shares) {
-			userId
-		}
-	}
-`;
+interface stock {
+	symbol: string;
+	shares: number;
+}
 
-const Buy: React.FC<IProps> = (props) => {
-	const [SellStock, { data: data, loading: loading, error: error }] =
-		useMutation(SELL_STOCK);
+const Sell: React.FC<IProps> = (props) => {
+	const [stockSymbol, setStockSymbol] = useState<string>();
+	const [sharesToSell, setSharesToSell] = useState(1);
+	const [sellErr, setSellErr] = useState<String | null>(null);
+
+	const [
+		SellStock,
+		{ data: mutationData, loading: mutationLoading, error: reqErr },
+	] = useMutation(SELL_STOCK);
+
+	const [
+		RemoveStock,
+		{
+			data: mutationDataRemove,
+			loading: mutationLoadingRemove,
+			error: reqErrRemove,
+		},
+	] = useMutation(REMOVE_STOCK);
+
+	const {
+		loading: queryLoading,
+		error: queryErr,
+		data: queryData,
+		refetch: refetchStocks,
+	} = useQuery(GET_STOCKS, {
+		variables: {
+			userId: props.userId,
+		},
+	});
+
+	useEffect(() => {
+		if (queryData) {
+			setStockSymbol(queryData.stocks[0].symbol);
+		}
+	}, [queryData]);
+
+	const handleStockSymbolChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setStockSymbol(e.target.value);
+	};
+
+	const handleSharesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSharesToSell(Number(e.target.value));
+	};
+
+	const handleSumit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		setSharesToSell(1);
+	};
 
 	const sellStock = async () => {
-		await SellStock({
-			variables: { userId: props.userId, symbol: 'TEST', shares: 1 },
-		});
+		let stockPrice;
+
+		const res = await axios.get(`api/stockquote?symbol=${stockSymbol}`);
+		stockPrice = res.data.latestPrice;
+
+		const userStockData = queryData.stocks.find(
+			(stock: stock) => stock.symbol === stockSymbol
+		);
+
+		if (sharesToSell > userStockData.shares) {
+			setSellErr("You don't own enough stock");
+			return;
+		}
+
+		if (stockPrice && sharesToSell === userStockData.shares) {
+			setSellErr(null);
+			await RemoveStock({
+				variables: {
+					userId: props.userId,
+					symbol: stockSymbol,
+					price: stockPrice * sharesToSell,
+					shares: sharesToSell,
+				},
+			});
+			refetchStocks();
+			return;
+		}
+
+		if (stockPrice) {
+			setSellErr(null);
+			await SellStock({
+				variables: {
+					userId: props.userId,
+					symbol: stockSymbol,
+					price: stockPrice * sharesToSell,
+					shares: sharesToSell,
+				},
+			});
+			refetchStocks();
+		}
 	};
 
 	return (
 		<div>
 			<p>{props.user.email}</p>
-			<button onClick={sellStock}>Sell</button>
+			<form onSubmit={handleSumit}>
+				<select
+					name='stocks'
+					value={stockSymbol || queryData.stocks[0]}
+					onChange={handleStockSymbolChange}
+				>
+					{queryData.stocks.map((stock: any) => {
+						return (
+							<option key={stock.symbol} value={stock.symbol}>
+								{stock.symbol} : {stock.shares}
+							</option>
+						);
+					})}
+				</select>
+				<input
+					placeholder='Shares'
+					type='number'
+					min='1'
+					onChange={handleSharesChange}
+					value={sharesToSell}
+				/>
+				<button
+					disabled={mutationLoading || mutationLoadingRemove}
+					onClick={sellStock}
+				>
+					Sell
+				</button>
+			</form>
+			{sellErr && <p>Error: {sellErr}</p>}
 		</div>
 	);
 };
 
-export default Buy;
+export default Sell;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const session = await getSession(context);
-	const data = session!;
+	const user = session!;
+	const apolloClient = initializeApollo();
 	if (!session) {
 		return {
 			redirect: {
@@ -61,7 +160,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			},
 		};
 	}
-	return {
-		props: data,
-	};
+
+	await apolloClient.query({
+		query: GET_STOCKS,
+		variables: { userId: user.userId },
+	});
+
+	return addApolloState(apolloClient, {
+		props: user,
+	});
 };
