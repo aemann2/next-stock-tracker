@@ -17,8 +17,6 @@ const History: React.FC<IProps> = (props) => {
 			userId: id,
 		},
 	});
-	console.log(data.transactions[0].transacted);
-	console.log(new Date(1643666443555));
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Oops, something went wrong {error.message}</p>;
 	return (
@@ -26,12 +24,11 @@ const History: React.FC<IProps> = (props) => {
 			<p>{email}</p>
 			{data.transactions.map((transaction: any, index: any) => (
 				<div key={index}>
-					<span>{transaction.symbol}</span> | <span>{transaction.shares}</span>{' '}
-					| <span>{transaction.price}</span> |{' '}
-					<span>{transaction.transType}</span> |{' '}
-					<span>
+					<p>
+						{transaction.symbol} | {transaction.shares} | {transaction.price} |{' '}
+						{transaction.transType} |
 						{new Date(Number(transaction.transacted)).toLocaleString()}
-					</span>
+					</p>
 				</div>
 			))}
 		</div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import { GET_STOCKS } from '../queries';
@@ -9,6 +9,8 @@ import { addApolloState, initializeApollo } from '../lib/apolloClient';
 interface IProps {
 	email: string;
 	id: string;
+	userStockData: any;
+	stockApiData: any;
 }
 
 interface stock {
@@ -16,37 +18,41 @@ interface stock {
 	shares: number;
 }
 
+interface stockQueryData {
+	current:
+		| {
+				[stocks: string]: {
+					quote: {
+						companyName: string;
+					};
+				};
+		  }
+		| undefined;
+}
+
 const Home: React.FC<IProps> = (props) => {
-	const { email, id } = props;
+	const { email, id, stockApiData } = props;
 	const { loading, error, data } = useQuery(GET_STOCKS, {
 		variables: {
 			userId: id,
 		},
 	});
-	const stockData = useRef();
-
-	const stockSymbols = data.stocks.map((stock: stock) => stock.symbol);
-
-	useEffect(() => {
-		const getBatch = async () => {
-			const res = await axios.get(
-				`api/batchquote?symbols=${stockSymbols.join(',')}`
-			);
-			stockData.current = res.data.data;
-			console.log(stockData.current);
-		};
-		getBatch();
-	});
 
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Oops, something went wrong {error.message}</p>;
+
 	return (
 		<div>
 			<p>{email}</p>
 			{data.stocks.map((stock: stock, index: number) => (
 				<div key={index}>
 					<p>
-						{stock.symbol}, {stock.shares}
+						{stock.symbol} | {stock.shares} |{' '}
+						{stockApiData[stock.symbol].quote.companyName} |{' '}
+						{stockApiData[stock.symbol].quote.latestPrice} | $
+						{(
+							stock.shares * stockApiData[stock.symbol].quote.latestPrice
+						).toFixed(2)}
 					</p>
 				</div>
 			))}
@@ -70,15 +76,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		};
 	}
 
-	await apolloClient.query({
+	const userStockData = await apolloClient.query({
 		query: GET_STOCKS,
 		variables: { userId: user.userId },
 	});
+
+	const stockSymbols = userStockData.data.stocks.map(
+		(stock: stock) => stock.symbol
+	);
+
+	const stockApiData = await axios.get(
+		`https://cloud.iexapis.com/v1/stock/market/batch?&types=quote&symbols=${stockSymbols}&token=${process.env.NEXT_PUBLIC_IEX_TOKEN}`
+	);
 
 	return addApolloState(apolloClient, {
 		props: {
 			id: user.userId,
 			email: user.user.email,
+			stockApiData: stockApiData.data,
 		},
 	});
 };

@@ -9,7 +9,6 @@ export default async function handler(req: Request, res: Response) {
 		const apiRes = await axios.get(
 			`https://cloud.iexapis.com/v1/stock/market/batch?&types=quote&symbols=${symbols}&token=${process.env.NEXT_PUBLIC_IEX_TOKEN}`
 		);
-		console.log(apiRes);
 		res.status(200).json({ data: apiRes.data });
 	} else {
 		res.status(401).json({ message: 'Not signed in' });
