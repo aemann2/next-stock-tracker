@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import { GET_STOCKS } from '../queries';
 import { useQuery } from '@apollo/client';
+import axios from 'axios';
 import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
 interface IProps {
@@ -22,6 +23,21 @@ const Home: React.FC<IProps> = (props) => {
 			userId: id,
 		},
 	});
+	const stockData = useRef();
+
+	const stockSymbols = data.stocks.map((stock: stock) => stock.symbol);
+
+	useEffect(() => {
+		const getBatch = async () => {
+			const res = await axios.get(
+				`api/batchquote?symbols=${stockSymbols.join(',')}`
+			);
+			stockData.current = res.data.data;
+			console.log(stockData.current);
+		};
+		getBatch();
+	});
+
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Oops, something went wrong {error.message}</p>;
 	return (
