@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
+
 import axios from 'axios';
 
 const Quote = () => {
@@ -9,14 +10,13 @@ const Quote = () => {
 	const [error, setError] = useState(false);
 
 	// Todo: improve error handling for this section. Check out Academind 180.
-	const getStock = async (symbol: string) => {
+	const getStockPrice = async (symbol: string) => {
 		let res = null;
 		setError(false);
 		try {
 			const apiRes = await axios.get(`api/stockquote?symbol=${symbol}`);
 			res = apiRes.data;
 		} catch (err) {
-			console.log(err);
 			res = null;
 		} finally {
 			if (res) {
@@ -34,7 +34,7 @@ const Quote = () => {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		getStock(stockSymbol);
+		getStockPrice(stockSymbol);
 	};
 
 	return (
