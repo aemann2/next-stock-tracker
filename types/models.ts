@@ -11,3 +11,16 @@ export interface StockQueryData {
 		};
 	};
 }
+
+export interface Transaction {
+	symbol: string;
+	shares: number;
+	price: number;
+	transType: TransType;
+	transacted: string;
+}
+
+enum TransType {
+	BUY,
+	SELL,
+}
