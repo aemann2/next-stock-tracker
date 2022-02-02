@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import axios from 'axios';
+
 import { BUY_STOCK, USER } from '../queries';
+
 import { useMutation, useQuery } from '@apollo/client';
 import { addApolloState, initializeApollo } from '../lib/apolloClient';
+import axios from 'axios';
 
 interface IProps {
 	user: {
