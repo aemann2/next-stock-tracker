@@ -1,37 +1,23 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { GET_STOCKS } from '../queries';
+
+import { GET_STOCKS, USER } from '../queries';
+import { Stock, StockQueryData } from '../types/models';
+
 import { useQuery } from '@apollo/client';
 import axios from 'axios';
 import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
 interface IProps {
-	email: string;
 	id: string;
-	userStockData: any;
-	stockApiData: any;
-}
-
-interface stock {
-	symbol: string;
-	shares: number;
-}
-
-interface stockQueryData {
-	current:
-		| {
-				[stocks: string]: {
-					quote: {
-						companyName: string;
-					};
-				};
-		  }
-		| undefined;
+	balance: number;
+	email: string;
+	stockApiData: StockQueryData;
 }
 
 const Home: React.FC<IProps> = (props) => {
-	const { email, id, stockApiData } = props;
+	const { id, balance, email, stockApiData } = props;
 	const { loading, error, data } = useQuery(GET_STOCKS, {
 		variables: {
 			userId: id,
@@ -44,18 +30,19 @@ const Home: React.FC<IProps> = (props) => {
 	return (
 		<div>
 			<p>{email}</p>
-			{data.stocks.map((stock: stock, index: number) => (
-				<div key={index}>
+			{data.stocks.map((stock: Stock) => (
+				<div key={stock.symbol}>
 					<p>
 						{stock.symbol} | {stock.shares} |{' '}
-						{stockApiData[stock.symbol].quote.companyName} |{' '}
-						{stockApiData[stock.symbol].quote.latestPrice} | $
+						{stockApiData[stock.symbol].quote.companyName} | $
+						{stockApiData[stock.symbol].quote.latestPrice.toFixed(2)} | $
 						{(
 							stock.shares * stockApiData[stock.symbol].quote.latestPrice
 						).toFixed(2)}
 					</p>
 				</div>
 			))}
+			<p>Balance: ${balance}</p>
 		</div>
 	);
 };
@@ -81,8 +68,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		variables: { userId: user.userId },
 	});
 
+	const userData = await apolloClient.query({
+		query: USER,
+		variables: { id: user.userId },
+	});
+
 	const stockSymbols = userStockData.data.stocks.map(
-		(stock: stock) => stock.symbol
+		(stock: Stock) => stock.symbol
 	);
 
 	const stockApiData = await axios.get(
@@ -92,6 +84,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	return addApolloState(apolloClient, {
 		props: {
 			id: user.userId,
+			balance: userData.data.user.balance,
 			email: user.user.email,
 			stockApiData: stockApiData.data,
 		},
