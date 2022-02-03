@@ -1,30 +1,42 @@
-import { prisma } from '@prisma/client';
 import { Context } from './context';
+import * as model from './models';
 
 export const resolvers = {
 	Query: {
-		users: async (_parent: any, _args: any, ctx: Context) =>
+		users: async (_parent: undefined, _args: null, ctx: Context) =>
 			await ctx.prisma.user.findMany(),
-		user: async (_parent: any, args: any, ctx: Context) =>
+		user: async (_parent: undefined, args: model.queryUserArgs, ctx: Context) =>
 			await ctx.prisma.user.findUnique({
 				where: {
 					id: args.id,
 				},
 			}),
-		stocks: async (_parent: any, args: any, ctx: Context) =>
+		stocks: async (
+			_parent: undefined,
+			args: model.queryStocksArgs,
+			ctx: Context
+		) =>
 			await ctx.prisma.stock.findMany({
 				where: {
 					userId: args.userId,
 				},
 			}),
-		stock: async (_parent: any, args: any, ctx: Context) =>
+		stock: async (
+			_parent: undefined,
+			args: model.queryStockArgs,
+			ctx: Context
+		) =>
 			await ctx.prisma.stock.findMany({
 				where: {
 					userId: args.userId,
 					symbol: args.symbol,
 				},
 			}),
-		transactions: async (_parent: any, args: any, ctx: Context) =>
+		transactions: async (
+			_parent: undefined,
+			args: model.queryTransactionsArgs,
+			ctx: Context
+		) =>
 			await ctx.prisma.transaction.findMany({
 				where: {
 					userId: args.userId,
@@ -32,7 +44,11 @@ export const resolvers = {
 			}),
 	},
 	Mutation: {
-		addStock: async (_parent: any, args: any, ctx: Context) =>
+		addStock: async (
+			_parent: undefined,
+			args: model.addStockArgs,
+			ctx: Context
+		) =>
 			await ctx.prisma.stock.upsert({
 				where: {
 					// TO FIX: This causes a build error
@@ -53,7 +69,11 @@ export const resolvers = {
 					shares: args.shares,
 				},
 			}),
-		addTransaction: async (_parent: any, args: any, ctx: Context) =>
+		addTransaction: async (
+			_parent: undefined,
+			args: model.addTransactionArgs,
+			ctx: Context
+		) =>
 			await ctx.prisma.transaction.create({
 				data: {
 					userId: args.userId,
@@ -63,7 +83,11 @@ export const resolvers = {
 					transType: args.transType,
 				},
 			}),
-		removeStock: async (_parent: any, args: any, ctx: Context) =>
+		removeStock: async (
+			_parent: undefined,
+			args: model.removeStockArgs,
+			ctx: Context
+		) =>
 			await ctx.prisma.stock.update({
 				where: {
 					// TO FIX: This causes a build error
@@ -79,7 +103,11 @@ export const resolvers = {
 					},
 				},
 			}),
-		modifyUser: async (_parent: any, args: any, ctx: Context) =>
+		modifyUser: async (
+			_parent: undefined,
+			args: model.modifyUserArgs,
+			ctx: Context
+		) =>
 			await ctx.prisma.user.update({
 				where: {
 					id: args.id,
@@ -90,7 +118,11 @@ export const resolvers = {
 					},
 				},
 			}),
-		deleteStock: async (_parent: any, args: any, ctx: Context) =>
+		deleteStock: async (
+			_parent: undefined,
+			args: model.deleteStockArgs,
+			ctx: Context
+		) =>
 			await ctx.prisma.stock.delete({
 				where: {
 					// TO FIX: This causes a build error

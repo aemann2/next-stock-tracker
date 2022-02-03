@@ -5,8 +5,7 @@ export type Context = {
 	prisma: PrismaClient;
 };
 
-// FIX: remove req and res from the context function if they're not used in the future
-export async function createContext(req: any, res: any): Promise<Context> {
+export async function createContext(): Promise<Context> {
 	return {
 		prisma,
 	};
