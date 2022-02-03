@@ -1,7 +1,10 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
+
 import { GET_TRANSACTIONS } from '../queries';
+import { Transaction } from '../types/models';
+
 import { useQuery } from '@apollo/client';
 import { addApolloState, initializeApollo } from '../lib/apolloClient';
 
@@ -17,13 +20,15 @@ const History: React.FC<IProps> = (props) => {
 			userId: id,
 		},
 	});
+
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Oops, something went wrong {error.message}</p>;
+
 	return (
 		<div>
 			<p>{email}</p>
-			{data.transactions.map((transaction: any, index: any) => (
-				<div key={index}>
+			{data.transactions.map((transaction: Transaction) => (
+				<div key={transaction.symbol}>
 					<p>
 						{transaction.symbol} | {transaction.shares} | {transaction.price} |{' '}
 						{transaction.transType} |

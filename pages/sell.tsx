@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
-import axios from 'axios';
 import { getSession } from 'next-auth/react';
+
 import { SELL_STOCK, REMOVE_STOCK, GET_STOCKS } from '../queries';
+import { Stock } from '../types/models';
+
 import { useMutation, useQuery } from '@apollo/client';
 import { addApolloState, initializeApollo } from '../lib/apolloClient';
+import axios from 'axios';
 
 interface IProps {
 	user: {
@@ -13,27 +16,27 @@ interface IProps {
 	userId: string;
 }
 
-interface stock {
-	symbol: string;
-	shares: number;
-}
-
 const Sell: React.FC<IProps> = (props) => {
 	const [stockSymbol, setStockSymbol] = useState<string>();
 	const [sharesToSell, setSharesToSell] = useState(1);
+	const [transactionLoading, setTransactionLoading] = useState(false);
 	const [sellErr, setSellErr] = useState<String | null>(null);
 
 	const [
 		SellStock,
-		{ data: mutationData, loading: mutationLoading, error: reqErr },
+		{
+			data: sellMutationData,
+			loading: sellMutationLoading,
+			error: sellMutationErr,
+		},
 	] = useMutation(SELL_STOCK);
 
 	const [
 		RemoveStock,
 		{
-			data: mutationDataRemove,
-			loading: mutationLoadingRemove,
-			error: reqErrRemove,
+			data: removeMutationData,
+			loading: removeMutationLoading,
+			error: removeMutationErr,
 		},
 	] = useMutation(REMOVE_STOCK);
 
@@ -68,17 +71,19 @@ const Sell: React.FC<IProps> = (props) => {
 	};
 
 	const sellStock = async () => {
+		setTransactionLoading(true);
 		let stockPrice;
 
 		const res = await axios.get(`api/stockquote?symbol=${stockSymbol}`);
 		stockPrice = res.data.latestPrice;
 
 		const userStockData = queryData.stocks.find(
-			(stock: stock) => stock.symbol === stockSymbol
+			(stock: Stock) => stock.symbol === stockSymbol
 		);
 
 		if (sharesToSell > userStockData.shares) {
 			setSellErr("You don't own enough stock");
+			setTransactionLoading(false);
 			return;
 		}
 
@@ -93,6 +98,7 @@ const Sell: React.FC<IProps> = (props) => {
 				},
 			});
 			refetchStocks();
+			setTransactionLoading(false);
 			return;
 		}
 
@@ -107,6 +113,7 @@ const Sell: React.FC<IProps> = (props) => {
 				},
 			});
 			refetchStocks();
+			setTransactionLoading(false);
 		}
 	};
 
@@ -118,8 +125,9 @@ const Sell: React.FC<IProps> = (props) => {
 					name='stocks'
 					value={stockSymbol || queryData.stocks[0]}
 					onChange={handleStockSymbolChange}
+					disabled={transactionLoading}
 				>
-					{queryData.stocks.map((stock: any) => {
+					{queryData.stocks.map((stock: Stock) => {
 						return (
 							<option key={stock.symbol} value={stock.symbol}>
 								{stock.symbol} : {stock.shares}
@@ -133,11 +141,9 @@ const Sell: React.FC<IProps> = (props) => {
 					min='1'
 					onChange={handleSharesChange}
 					value={sharesToSell}
+					disabled={transactionLoading}
 				/>
-				<button
-					disabled={mutationLoading || mutationLoadingRemove}
-					onClick={sellStock}
-				>
+				<button disabled={transactionLoading} onClick={sellStock}>
 					Sell
 				</button>
 			</form>
@@ -152,6 +158,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	const session = await getSession(context);
 	const user = session!;
 	const apolloClient = initializeApollo();
+
 	if (!session) {
 		return {
 			redirect: {
