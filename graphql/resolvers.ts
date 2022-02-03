@@ -51,8 +51,6 @@ export const resolvers = {
 		) =>
 			await ctx.prisma.stock.upsert({
 				where: {
-					// TO FIX: This causes a build error
-					//@ts-ignore
 					userStockId: {
 						userId: args.userId,
 						symbol: args.symbol,
