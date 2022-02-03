@@ -18,6 +18,7 @@ interface IProps {
 const Buy: React.FC<IProps> = (props) => {
 	const [stockSymbol, setStockSymbol] = useState('');
 	const [shares, setShares] = useState(1);
+	const [transactionLoading, setTransactionLoading] = useState(false);
 	const [buyErr, setBuyErr] = useState<String | null>(null);
 
 	const [
@@ -41,6 +42,10 @@ const Buy: React.FC<IProps> = (props) => {
 	};
 
 	const handleSharesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (Number(e.target.value) < 1) {
+			setShares(1);
+			return;
+		}
 		setShares(Number(e.target.value));
 	};
 
@@ -50,6 +55,7 @@ const Buy: React.FC<IProps> = (props) => {
 	};
 
 	const buyStock = async () => {
+		setTransactionLoading(true);
 		let stockPrice;
 
 		try {
@@ -61,10 +67,12 @@ const Buy: React.FC<IProps> = (props) => {
 			stockPrice = res.data.latestPrice;
 		} catch (error) {
 			setBuyErr('Stock does not exist');
+			setTransactionLoading(false);
 		}
 
 		if (stockPrice * shares > queryData!.user.balance) {
 			setBuyErr('Insufficient funds');
+			setTransactionLoading(false);
 			return;
 		}
 
@@ -79,6 +87,7 @@ const Buy: React.FC<IProps> = (props) => {
 				},
 			});
 			refetchBalance();
+			setTransactionLoading(false);
 		}
 	};
 	return (
@@ -89,6 +98,7 @@ const Buy: React.FC<IProps> = (props) => {
 					placeholder='Symbol'
 					onChange={handleStockSymbolChange}
 					value={stockSymbol}
+					disabled={transactionLoading}
 				/>
 				<input
 					placeholder='Shares'
@@ -96,8 +106,9 @@ const Buy: React.FC<IProps> = (props) => {
 					min='1'
 					onChange={handleSharesChange}
 					value={shares}
+					disabled={transactionLoading}
 				/>
-				<button disabled={mutationLoading} onClick={buyStock}>
+				<button disabled={transactionLoading} onClick={buyStock}>
 					Buy
 				</button>
 			</form>
