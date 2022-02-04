@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 
@@ -20,6 +20,7 @@ const Buy: React.FC<IProps> = (props) => {
 	const [shares, setShares] = useState(1);
 	const [transactionLoading, setTransactionLoading] = useState(false);
 	const [buyErr, setBuyErr] = useState<String | null>(null);
+	const [userBalance, setUserBalance] = useState(null);
 
 	const [
 		BuyStock,
@@ -30,19 +31,22 @@ const Buy: React.FC<IProps> = (props) => {
 		loading: queryLoading,
 		error: queryErr,
 		data: queryData,
-		refetch: refetchBalance,
 	} = useQuery(USER, {
 		variables: {
 			id: props.userId,
 		},
 	});
 
+	useEffect(() => {
+		setUserBalance(queryData?.user.balance);
+	}, [queryData?.user.balance]);
+
 	const handleStockSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setStockSymbol(e.target.value);
 	};
 
 	const handleSharesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (Number(e.target.value) < 1) {
+		if (Number(e.target.value) === 0) {
 			setShares(1);
 			return;
 		}
@@ -70,7 +74,7 @@ const Buy: React.FC<IProps> = (props) => {
 			setTransactionLoading(false);
 		}
 
-		if (stockPrice * shares > queryData!.user.balance) {
+		if (stockPrice * shares > userBalance!) {
 			setBuyErr('Insufficient funds');
 			setTransactionLoading(false);
 			return;
@@ -78,7 +82,7 @@ const Buy: React.FC<IProps> = (props) => {
 
 		if (stockPrice) {
 			setBuyErr(null);
-			await BuyStock({
+			const { data } = await BuyStock({
 				variables: {
 					userId: props.userId,
 					symbol: stockSymbol,
@@ -86,10 +90,11 @@ const Buy: React.FC<IProps> = (props) => {
 					shares: shares,
 				},
 			});
-			refetchBalance();
+			setUserBalance(data.modifyUser.balance);
 			setTransactionLoading(false);
 		}
 	};
+
 	return (
 		<div>
 			<p>{props.user.email}</p>
