@@ -66,6 +66,7 @@ export const SELL_STOCK = gql`
 		}
 		removeStock(userId: $userId, symbol: $symbol, shares: $shares) {
 			id
+			shares
 		}
 		modifyUser(id: $userId, price: $price, shares: $shares) {
 			balance
@@ -92,6 +93,7 @@ export const REMOVE_STOCK = gql`
 		}
 		deleteStock(userId: $userId, symbol: $symbol) {
 			id
+			shares
 		}
 		modifyUser(id: $userId, price: $price, shares: $shares) {
 			balance
