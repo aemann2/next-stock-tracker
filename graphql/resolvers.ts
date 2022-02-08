@@ -17,6 +17,11 @@ export const resolvers = {
 			ctx: Context
 		) =>
 			await ctx.prisma.stock.findMany({
+				orderBy: [
+					{
+						symbol: 'asc',
+					},
+				],
 				where: {
 					userId: args.userId,
 				},
