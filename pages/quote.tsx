@@ -9,9 +9,8 @@ interface IState {
 }
 
 const Quote = () => {
-	const [stockPrice, setStockPrice] = useState(null);
+	const [stockPrices, setStockPrices] = useState<any>([]);
 	const [inputValues, setInputValues] = useState<IState>({});
-	const [stockSymbol, setStockSymbol] = useState('');
 	const [numberOfInputs, setNumberOfInputs] = useState(1);
 	const [error, setError] = useState(false);
 
@@ -24,23 +23,35 @@ const Quote = () => {
 	}, [numberOfInputs]);
 
 	// Todo: improve error handling for this section. Check out Academind 180.
-	const getStockPrice = async (symbol: string) => {
+	const getStockPrice = async (symbols: string[]) => {
 		let res = null;
 		setError(false);
 		try {
-			const apiRes = await axios.get(`api/stockquote?symbol=${symbol}`);
+			const apiRes = await axios.get(
+				`api/batchquote?symbols=${symbols.join(',')}`
+			);
 			res = apiRes.data;
 		} catch (err) {
 			res = null;
 		} finally {
 			if (res) {
-				setStockPrice(res.latestPrice);
+				for (const property in res.data) {
+					setStockPrices([
+						...stockPrices,
+						{
+							name: property,
+							price: res.data[property].quote.latestPrice,
+						},
+					]);
+				}
 			} else {
-				setStockPrice(null);
+				setStockPrices([]);
 				setError(true);
 			}
 		}
 	};
+
+	console.log(stockPrices);
 
 	function handleSymbolInputChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const value = e.target.value;
@@ -60,9 +71,7 @@ const Quote = () => {
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const values = Object.values(inputValues);
-		if (values.length === 1) {
-			getStockPrice(stockSymbol);
-		}
+		getStockPrice(values);
 	};
 
 	const inputs = [];
@@ -101,7 +110,14 @@ const Quote = () => {
 					onChange={handleNumberOfInputsChange}
 				/>
 			</div>
-			{stockPrice && <p>{stockPrice}</p>}
+			{stockPrices &&
+				stockPrices.map((stock: any, index: any) => {
+					return (
+						<p key={index}>
+							{stock.name}: ${stock.price}
+						</p>
+					);
+				})}
 			{error && <p>Error: That stock does not exist </p>}
 		</div>
 	);
