@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 
 import axios from 'axios';
 
+interface IState {
+	[key: number]: string;
+}
+
 const Quote = () => {
 	const [stockPrice, setStockPrice] = useState(null);
+	const [inputValues, setInputValues] = useState<IState>({});
 	const [stockSymbol, setStockSymbol] = useState('');
 	const [numberOfInputs, setNumberOfInputs] = useState(1);
 	const [error, setError] = useState(false);
+
+	useEffect(() => {
+		const newInputValues: IState = {};
+		for (let i = 0; i < numberOfInputs; i++) {
+			newInputValues[i] = inputValues[i] || '';
+		}
+		setInputValues(newInputValues);
+	}, [numberOfInputs]);
 
 	// Todo: improve error handling for this section. Check out Academind 180.
 	const getStockPrice = async (symbol: string) => {
@@ -29,9 +42,13 @@ const Quote = () => {
 		}
 	};
 
-	const handleSymbolInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setStockSymbol(e.target.value);
-	};
+	function handleSymbolInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+		const value = e.target.value;
+		setInputValues({
+			...inputValues,
+			[e.target.name]: value,
+		});
+	}
 
 	const handleNumberOfInputsChange = (
 		e: React.ChangeEvent<HTMLInputElement>
@@ -42,7 +59,10 @@ const Quote = () => {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		getStockPrice(stockSymbol);
+		const values = Object.values(inputValues);
+		if (values.length === 1) {
+			getStockPrice(stockSymbol);
+		}
 	};
 
 	const inputs = [];
@@ -50,10 +70,12 @@ const Quote = () => {
 	for (let i = 0; i < numberOfInputs; i++) {
 		inputs.push(
 			<input
+				key={i}
 				type='text'
-				name={`stock${i}`}
+				name={`${i}`}
 				placeholder='Enter a symbol'
-				value={stockSymbol}
+				maxLength={5}
+				value={inputValues[i] || ''}
 				onChange={handleSymbolInputChange}
 			/>
 		);
@@ -63,7 +85,9 @@ const Quote = () => {
 		<div>
 			<form onSubmit={handleSubmit}>
 				{inputs}
-				<button type='submit'>Submit</button>
+				<button disabled={Object.values(inputValues)[0] === ''} type='submit'>
+					Submit
+				</button>
 			</form>
 			<div>
 				<label htmlFor='numberOfInputs'>Enter Multiple</label>
