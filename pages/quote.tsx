@@ -10,6 +10,7 @@ interface IState {
 
 const Quote = () => {
 	const [stockPrices, setStockPrices] = useState<any>([]);
+	const [queryLoading, setQueryLoading] = useState(false);
 	const [inputValues, setInputValues] = useState<IState>({});
 	const [numberOfInputs, setNumberOfInputs] = useState(1);
 	const [error, setError] = useState(false);
@@ -25,6 +26,8 @@ const Quote = () => {
 	// Todo: improve error handling for this section. Check out Academind 180.
 	const getStockPrice = async (symbols: string[]) => {
 		let res = null;
+		setStockPrices([]);
+		setQueryLoading(true);
 		setError(false);
 		try {
 			const apiRes = await axios.get(
@@ -35,23 +38,21 @@ const Quote = () => {
 			res = null;
 		} finally {
 			if (res) {
+				const stockResults = [];
 				for (const property in res.data) {
-					setStockPrices([
-						...stockPrices,
-						{
-							name: property,
-							price: res.data[property].quote.latestPrice,
-						},
-					]);
+					stockResults.push({
+						name: property,
+						price: res.data[property].quote.latestPrice,
+					});
 				}
+				setStockPrices(stockResults);
 			} else {
 				setStockPrices([]);
 				setError(true);
 			}
 		}
+		setQueryLoading(false);
 	};
-
-	console.log(stockPrices);
 
 	function handleSymbolInputChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const value = e.target.value;
@@ -68,10 +69,10 @@ const Quote = () => {
 		setNumberOfInputs(Number(e.target.value));
 	};
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const values = Object.values(inputValues);
-		getStockPrice(values);
+		await getStockPrice(values);
 	};
 
 	const inputs = [];
@@ -84,6 +85,7 @@ const Quote = () => {
 				name={`${i}`}
 				placeholder='Enter a symbol'
 				maxLength={5}
+				disabled={queryLoading}
 				value={inputValues[i] || ''}
 				onChange={handleSymbolInputChange}
 			/>
@@ -94,7 +96,10 @@ const Quote = () => {
 		<div>
 			<form onSubmit={handleSubmit}>
 				{inputs}
-				<button disabled={Object.values(inputValues)[0] === ''} type='submit'>
+				<button
+					disabled={Object.values(inputValues)[0] === '' || queryLoading}
+					type='submit'
+				>
 					Submit
 				</button>
 			</form>
@@ -104,6 +109,7 @@ const Quote = () => {
 					type='number'
 					name='numberOfInputs'
 					id='numberOfInputs'
+					disabled={queryLoading}
 					min={1}
 					max={4}
 					value={numberOfInputs}
@@ -118,7 +124,7 @@ const Quote = () => {
 						</p>
 					);
 				})}
-			{error && <p>Error: That stock does not exist </p>}
+			{error && <p>Error: You must enter at least one valid stock symbol.</p>}
 		</div>
 	);
 };
