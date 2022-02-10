@@ -2,6 +2,10 @@ export interface Stock {
 	symbol: string;
 	shares: number;
 }
+export interface StockPrice {
+	name: string;
+	price: number;
+}
 
 export interface StockQueryData {
 	[stock: string]: {

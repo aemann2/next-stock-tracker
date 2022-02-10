@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 
+import { StockPrice } from '../types/models';
+
 import axios from 'axios';
 
 interface IState {
@@ -9,19 +11,23 @@ interface IState {
 }
 
 const Quote = () => {
-	const [stockPrices, setStockPrices] = useState<any>([]);
+	const [stockPrices, setStockPrices] = useState<StockPrice[] | []>([]);
 	const [queryLoading, setQueryLoading] = useState(false);
 	const [inputValues, setInputValues] = useState<IState>({});
 	const [numberOfInputs, setNumberOfInputs] = useState(1);
 	const [error, setError] = useState(false);
 
+	const memoInputValues = React.useMemo(() => {
+		return inputValues;
+	}, []);
+
 	useEffect(() => {
 		const newInputValues: IState = {};
 		for (let i = 0; i < numberOfInputs; i++) {
-			newInputValues[i] = inputValues[i] || '';
+			newInputValues[i] = memoInputValues[i] || '';
 		}
 		setInputValues(newInputValues);
-	}, [numberOfInputs]);
+	}, [numberOfInputs, memoInputValues]);
 
 	// Todo: improve error handling for this section. Check out Academind 180.
 	const getStockPrice = async (symbols: string[]) => {
@@ -117,9 +123,9 @@ const Quote = () => {
 				/>
 			</div>
 			{stockPrices &&
-				stockPrices.map((stock: any, index: any) => {
+				stockPrices.map((stock: StockPrice, index: number) => {
 					return (
-						<p key={index}>
+						<p key={stock.name + index}>
 							{stock.name}: ${stock.price}
 						</p>
 					);
