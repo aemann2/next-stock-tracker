@@ -17,17 +17,13 @@ const Quote = () => {
 	const [numberOfInputs, setNumberOfInputs] = useState(1);
 	const [error, setError] = useState(false);
 
-	const memoInputValues = React.useMemo(() => {
-		return inputValues;
-	}, []);
-
 	useEffect(() => {
 		const newInputValues: IState = {};
 		for (let i = 0; i < numberOfInputs; i++) {
-			newInputValues[i] = memoInputValues[i] || '';
+			newInputValues[i] = inputValues[i] || '';
 		}
 		setInputValues(newInputValues);
-	}, [numberOfInputs, memoInputValues]);
+	}, [numberOfInputs]);
 
 	// Todo: improve error handling for this section. Check out Academind 180.
 	const getStockPrice = async (symbols: string[]) => {
