@@ -1,58 +1,132 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
+
+import { StockPrice } from '../types/models';
+
 import axios from 'axios';
 
+interface IState {
+	[key: number]: string;
+}
+
 const Quote = () => {
-	const [stockPrice, setStockPrice] = useState(null);
-	const [stockSymbol, setStockSymbol] = useState('');
+	const [stockPrices, setStockPrices] = useState<StockPrice[] | []>([]);
+	const [queryLoading, setQueryLoading] = useState(false);
+	const [inputValues, setInputValues] = useState<IState>({});
+	const [numberOfInputs, setNumberOfInputs] = useState(1);
 	const [error, setError] = useState(false);
 
+	useEffect(() => {
+		const newInputValues: IState = {};
+		for (let i = 0; i < numberOfInputs; i++) {
+			newInputValues[i] = inputValues[i] || '';
+		}
+		setInputValues(newInputValues);
+	}, [numberOfInputs]);
+
 	// Todo: improve error handling for this section. Check out Academind 180.
-	const getStock = async (symbol: string) => {
+	const getStockPrice = async (symbols: string[]) => {
 		let res = null;
+		setStockPrices([]);
+		setQueryLoading(true);
 		setError(false);
 		try {
 			const apiRes = await axios.get(
-				`https://cloud.iexapis.com/stable/stock/${symbol}/quote?token=${process.env.NEXT_PUBLIC_IEX_TOKEN}`
+				`api/batchquote?symbols=${symbols.join(',')}`
 			);
 			res = apiRes.data;
 		} catch (err) {
-			console.log(err);
 			res = null;
 		} finally {
 			if (res) {
-				setStockPrice(res.latestPrice);
+				const stockResults = [];
+				for (const property in res.data) {
+					stockResults.push({
+						name: property,
+						price: res.data[property].quote.latestPrice,
+					});
+				}
+				setStockPrices(stockResults);
 			} else {
-				setStockPrice(null);
+				setStockPrices([]);
 				setError(true);
 			}
 		}
+		setQueryLoading(false);
 	};
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setStockSymbol(e.target.value);
+	function handleSymbolInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+		const value = e.target.value;
+		setInputValues({
+			...inputValues,
+			[e.target.name]: value,
+		});
+	}
+
+	const handleNumberOfInputsChange = (
+		e: React.ChangeEvent<HTMLInputElement>
+	) => {
+		if (Number(e.target.value) > 4 || Number(e.target.value) < 1) return;
+		setNumberOfInputs(Number(e.target.value));
 	};
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		getStock(stockSymbol);
+		const values = Object.values(inputValues);
+		await getStockPrice(values);
 	};
+
+	const inputs = [];
+
+	for (let i = 0; i < numberOfInputs; i++) {
+		inputs.push(
+			<input
+				key={i}
+				type='text'
+				name={`${i}`}
+				placeholder='Enter a symbol'
+				maxLength={5}
+				disabled={queryLoading}
+				value={inputValues[i] || ''}
+				onChange={handleSymbolInputChange}
+			/>
+		);
+	}
 
 	return (
 		<div>
 			<form onSubmit={handleSubmit}>
-				<input
-					type='text'
-					name='stock'
-					placeholder='Enter a symbol'
-					value={stockSymbol}
-					onChange={handleChange}
-				/>
-				<button type='submit'>Submit</button>
+				{inputs}
+				<button
+					disabled={Object.values(inputValues)[0] === '' || queryLoading}
+					type='submit'
+				>
+					Submit
+				</button>
 			</form>
-			{stockPrice && <p>{stockPrice}</p>}
-			{error && <p>Error: That stock does not exist </p>}
+			<div>
+				<label htmlFor='numberOfInputs'>Enter Multiple</label>
+				<input
+					type='number'
+					name='numberOfInputs'
+					id='numberOfInputs'
+					disabled={queryLoading}
+					min={1}
+					max={4}
+					value={numberOfInputs}
+					onChange={handleNumberOfInputsChange}
+				/>
+			</div>
+			{stockPrices &&
+				stockPrices.map((stock: StockPrice, index: number) => {
+					return (
+						<p key={stock.name + index}>
+							{stock.name}: ${stock.price}
+						</p>
+					);
+				})}
+			{error && <p>Error: You must enter at least one valid stock symbol.</p>}
 		</div>
 	);
 };
