@@ -62,6 +62,10 @@ const Sell: React.FC<IProps> = (props) => {
 	};
 
 	const handleSharesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (Number(e.target.value) === 0) {
+			setSharesToSell(1);
+			return;
+		}
 		setSharesToSell(Number(e.target.value));
 	};
 

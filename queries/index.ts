@@ -35,13 +35,14 @@ export const BUY_STOCK = gql`
 			price: $price
 			transType: BUY
 		) {
-			userId
+			symbol
+			transType
 		}
 		addStock(userId: $userId, symbol: $symbol, shares: $shares) {
-			userId
+			id
 		}
 		modifyUser(id: $userId, price: $price, shares: $shares) {
-			id
+			balance
 		}
 	}
 `;
@@ -60,13 +61,15 @@ export const SELL_STOCK = gql`
 			price: $price
 			transType: SELL
 		) {
-			userId
+			symbol
+			transType
 		}
 		removeStock(userId: $userId, symbol: $symbol, shares: $shares) {
-			userId
+			id
+			shares
 		}
 		modifyUser(id: $userId, price: $price, shares: $shares) {
-			id
+			balance
 		}
 	}
 `;
@@ -85,13 +88,15 @@ export const REMOVE_STOCK = gql`
 			price: $price
 			transType: SELL
 		) {
-			userId
+			symbol
+			transType
 		}
 		deleteStock(userId: $userId, symbol: $symbol) {
-			userId
+			id
+			shares
 		}
 		modifyUser(id: $userId, price: $price, shares: $shares) {
-			id
+			balance
 		}
 	}
 `;
