@@ -63,11 +63,7 @@ const Buy: React.FC<IProps> = (props) => {
 		let stockPrice;
 
 		try {
-			const res = await axios.get(
-				`https://cloud.iexapis.com/stable/stock/${stockSymbol.toUpperCase()}/quote?token=${
-					process.env.NEXT_PUBLIC_IEX_TOKEN
-				}`
-			);
+			const res = await axios.get(`api/stockquote?symbol=${stockSymbol}`);
 			stockPrice = res.data.latestPrice;
 		} catch (error) {
 			setBuyErr('Stock does not exist');
