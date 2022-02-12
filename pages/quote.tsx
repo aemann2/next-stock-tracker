@@ -23,8 +23,11 @@ const Quote = () => {
 			newInputValues[i] = inputValues[i] || '';
 		}
 		setInputValues(newInputValues);
+<<<<<<< HEAD
 		// FIX: Fix this so you don't have to use the eslint hack
 		// eslint-disable-next-line
+=======
+>>>>>>> cc53ed4d36805be0d79cbc2d1b04b63484a84f3d
 	}, [numberOfInputs]);
 
 	// Todo: improve error handling for this section. Check out Academind 180.
