@@ -42,7 +42,7 @@ const Buy: React.FC<IProps> = (props) => {
 	}, [queryData?.user.balance]);
 
 	const handleStockSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setStockSymbol(e.target.value);
+		setStockSymbol(e.target.value.toUpperCase());
 	};
 
 	const handleSharesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +81,7 @@ const Buy: React.FC<IProps> = (props) => {
 			const { data } = await BuyStock({
 				variables: {
 					userId: props.userId,
-					symbol: stockSymbol,
+					symbol: stockSymbol.toUpperCase(),
 					price: -1 * (stockPrice * shares),
 					shares: shares,
 				},
@@ -99,6 +99,7 @@ const Buy: React.FC<IProps> = (props) => {
 					placeholder='Symbol'
 					onChange={handleStockSymbolChange}
 					value={stockSymbol}
+					maxLength={5}
 					disabled={transactionLoading}
 				/>
 				<input
