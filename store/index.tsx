@@ -39,4 +39,7 @@ export const navActions = navSlice.actions;
 
 export const modeActions = modeSlice.actions;
 
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
 export default store;
