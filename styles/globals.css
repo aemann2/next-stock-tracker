@@ -1,7 +1,26 @@
+/* Globals */
+
+html {
+	box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+	box-sizing: inherit;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	min-height: 100vh;
+	font-size: 100%;
+}
+
 html,
 body {
-	padding: 0;
-	margin: 0;
 	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
 		Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 	/* COLORS */
@@ -19,8 +38,4 @@ body {
 a {
 	color: inherit;
 	text-decoration: none;
-}
-
-* {
-	box-sizing: border-box;
 }
