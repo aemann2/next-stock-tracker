@@ -1,6 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 
+import { signOut } from 'next-auth/react';
+
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,6 +11,7 @@ import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 
 const drawerWidth = 240;
@@ -66,10 +69,9 @@ const NavLayout: React.FC = ({ children }) => {
 					</Link>
 				</List>
 				<List>
-					<ListItem button>
-						<ListItemIcon></ListItemIcon>
+					<ListItemButton onClick={() => signOut()} alignItems='center'>
 						<ListItemText primary={'Logout'} />
-					</ListItem>
+					</ListItemButton>
 				</List>
 			</Drawer>
 			<Box
