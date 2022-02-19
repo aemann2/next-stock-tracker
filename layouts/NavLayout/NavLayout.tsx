@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -33,26 +34,36 @@ const NavLayout: React.FC = ({ children }) => {
 				anchor='left'
 			>
 				<List>
-					<ListItem button>
-						<ListItemIcon></ListItemIcon>
-						<ListItemText primary={'Home'} />
-					</ListItem>
-					<ListItem button>
-						<ListItemIcon></ListItemIcon>
-						<ListItemText primary={'Buy'} />
-					</ListItem>
-					<ListItem button>
-						<ListItemIcon></ListItemIcon>
-						<ListItemText primary={'Sell'} />
-					</ListItem>
-					<ListItem button>
-						<ListItemIcon></ListItemIcon>
-						<ListItemText primary={'Quote'} />
-					</ListItem>
-					<ListItem button>
-						<ListItemIcon></ListItemIcon>
-						<ListItemText primary={'History'} />
-					</ListItem>
+					<Link href='/home' passHref>
+						<ListItem button>
+							<ListItemIcon></ListItemIcon>
+							<ListItemText primary={'Home'} />
+						</ListItem>
+					</Link>
+					<Link href='/buy' passHref>
+						<ListItem button>
+							<ListItemIcon></ListItemIcon>
+							<ListItemText primary={'Buy'} />
+						</ListItem>
+					</Link>
+					<Link href='/sell' passHref>
+						<ListItem button>
+							<ListItemIcon></ListItemIcon>
+							<ListItemText primary={'Sell'} />
+						</ListItem>
+					</Link>
+					<Link href='/quote' passHref>
+						<ListItem button>
+							<ListItemIcon></ListItemIcon>
+							<ListItemText primary={'Quote'} />
+						</ListItem>
+					</Link>
+					<Link href='/history' passHref>
+						<ListItem button>
+							<ListItemIcon></ListItemIcon>
+							<ListItemText primary={'History'} />
+						</ListItem>
+					</Link>
 				</List>
 				<List>
 					<ListItem button>
