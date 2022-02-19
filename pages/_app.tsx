@@ -1,5 +1,6 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
+import NavLayout from '../layouts/NavLayout/NavLayout';
 
 import { ApolloProvider } from '@apollo/client';
 import { useApollo } from '../lib/apolloClient';
@@ -15,7 +16,9 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
 		<Provider store={store}>
 			<ApolloProvider client={apolloClient}>
 				<SessionProvider session={session}>
-					<Component {...pageProps} />
+					<NavLayout>
+						<Component {...pageProps} />
+					</NavLayout>
 				</SessionProvider>
 			</ApolloProvider>
 		</Provider>
