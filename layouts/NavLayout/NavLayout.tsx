@@ -46,8 +46,10 @@ const NavLayout: React.FC = ({ children }) => {
 				sx={{
 					width: drawerWidth,
 					flexShrink: 0,
+					height: '100vh',
 					'& .MuiDrawer-paper': {
 						width: drawerWidth,
+						height: '100vh',
 						boxSizing: 'border-box',
 						backgroundColor: theme.palette.secondary.main,
 					},
@@ -97,7 +99,7 @@ const NavLayout: React.FC = ({ children }) => {
 						</ListItem>
 					</Link>
 				</List>
-				<List>
+				<List sx={{height: '100%', display: 'flex', alignItems: 'flex-end'}}>
 					<ListItemButton onClick={() => signOut()} alignItems='center'>
 							<ListItemIcon>
 								<Logout sx={{color: iconColor}} />
