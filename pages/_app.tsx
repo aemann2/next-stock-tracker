@@ -28,7 +28,7 @@ const theme = createTheme({
 	},
   palette: {
     primary: {
-      main: indigo[900],
+      main: '#080732',
 			contrastText: indigo[50],
     },
 		secondary: {
