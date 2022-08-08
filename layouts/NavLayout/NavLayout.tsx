@@ -12,16 +12,31 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-
+import ListItemText, {ListItemTextProps} from '@mui/material/ListItemText';
+import { Home, ShoppingCart, AttachMoney, Help, History, Logout } from '@mui/icons-material'
+import { styled } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
+import { indigo } from '@mui/material/colors';
 
 const drawerWidth = 240;
+
+const iconColor = `${indigo[50]}`
+
+const ItemText = styled(ListItemText)<ListItemTextProps>(({ theme }) => ({
+  color: theme.palette.primary.contrastText,
+  '& .MuiTypography-root': {
+		fontWeight: 700,
+		fontSize: 20,
+    '&:hover': {
+      color: `yellow`,
+    },
+  },
+}));
 
 const NavLayout: React.FC = ({ children }) => {
 	const theme = useTheme();
 	return (
-		<Box sx={{ display: 'flex' }}>
+		<Box sx={{ display: 'flex'}}>
 			<CssBaseline />
 			<AppBar
 				position='fixed'
@@ -35,7 +50,6 @@ const NavLayout: React.FC = ({ children }) => {
 						width: drawerWidth,
 						boxSizing: 'border-box',
 						backgroundColor: theme.palette.secondary.main,
-						color: theme.palette.primary.contrastText,
 					},
 				}}
 				variant='permanent'
@@ -44,38 +58,51 @@ const NavLayout: React.FC = ({ children }) => {
 				<List>
 					<Link href='/home' passHref>
 						<ListItem button>
-							<ListItemIcon></ListItemIcon>
-							<ListItemText primary={'Home'} />
+							<ListItemIcon >
+								<Home sx={{color: iconColor}}/>
+							</ListItemIcon>
+							<ItemText primary={'Home'} />
 						</ListItem>
 					</Link>
 					<Link href='/buy' passHref>
 						<ListItem button>
-							<ListItemIcon></ListItemIcon>
-							<ListItemText primary={'Buy'} />
+							<ListItemIcon>
+								<ShoppingCart sx={{color: iconColor}} />
+							</ListItemIcon>
+							<ItemText primary={'Buy'} />
 						</ListItem>
 					</Link>
 					<Link href='/sell' passHref>
 						<ListItem button>
-							<ListItemIcon></ListItemIcon>
-							<ListItemText primary={'Sell'} />
+							<ListItemIcon>
+								<AttachMoney sx={{color: iconColor}} />
+							</ListItemIcon>
+							<ItemText sx={{color: iconColor}} primary={'Sell'} />
 						</ListItem>
 					</Link>
 					<Link href='/quote' passHref>
 						<ListItem button>
-							<ListItemIcon></ListItemIcon>
-							<ListItemText primary={'Quote'} />
+							<ListItemIcon>
+								<Help sx={{color: iconColor}} />
+							</ListItemIcon>
+							<ItemText primary={'Quote'} />
 						</ListItem>
 					</Link>
 					<Link href='/history' passHref>
 						<ListItem button>
-							<ListItemIcon></ListItemIcon>
-							<ListItemText primary={'History'} />
+							<ListItemIcon>
+								<History sx={{color: iconColor}} />
+							</ListItemIcon>
+							<ItemText primary={'History'} />
 						</ListItem>
 					</Link>
 				</List>
 				<List>
 					<ListItemButton onClick={() => signOut()} alignItems='center'>
-						<ListItemText primary={'Logout'} />
+							<ListItemIcon>
+								<Logout sx={{color: iconColor}} />
+							</ListItemIcon>
+						<ItemText primary={'Logout'} />
 					</ListItemButton>
 				</List>
 			</Drawer>

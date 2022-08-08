@@ -29,11 +29,11 @@ const theme = createTheme({
   palette: {
     primary: {
       main: indigo[900],
-			contrastText: indigo[50]
+			contrastText: indigo[50],
     },
 		secondary: {
 			main: indigo[800],
-		}
+		},
   },
 });
 
