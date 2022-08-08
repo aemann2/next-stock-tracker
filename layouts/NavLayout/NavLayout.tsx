@@ -14,9 +14,12 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 
+import { useTheme } from '@mui/material/styles';
+
 const drawerWidth = 240;
 
 const NavLayout: React.FC = ({ children }) => {
+	const theme = useTheme();
 	return (
 		<Box sx={{ display: 'flex' }}>
 			<CssBaseline />
@@ -31,6 +34,8 @@ const NavLayout: React.FC = ({ children }) => {
 					'& .MuiDrawer-paper': {
 						width: drawerWidth,
 						boxSizing: 'border-box',
+						backgroundColor: theme.palette.secondary.main,
+						color: theme.palette.primary.contrastText,
 					},
 				}}
 				variant='permanent'
