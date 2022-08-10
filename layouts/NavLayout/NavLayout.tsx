@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 import Box from '@mui/material/Box';
 import Drawer, {DrawerProps} from '@mui/material/Drawer';
@@ -9,7 +9,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
-import ListItem, { ListItemProps } from '@mui/material/ListItem';
 import ListItemIcon, { ListItemIconProps } from '@mui/material/ListItemIcon';
 import ListItemButton, {ListItemButtonProps} from '@mui/material/ListItemButton';
 import ListItemText, {ListItemTextProps} from '@mui/material/ListItemText';
@@ -37,9 +36,8 @@ const StyledListItemIcon = styled(ListItemIcon)<ListItemIconProps>(() => ({
   color: indigo[50],
 }));
 
-const StyledListItemButton = styled(ListItem)<ListItemButtonProps>(() => ({
+const StyledListItemButton = styled(ListItemButton)<ListItemButtonProps>(() => ({
 	'&:hover': {
-		cursor: 'pointer',
 		'.MuiListItemIcon-root, .MuiTypography-root': {
 			color: 'yellow'
 		}
@@ -60,6 +58,7 @@ const StyledDrawer = styled(Drawer)<DrawerProps>(({ theme }) => ({
 
 const NavLayout: React.FC = ({ children }) => {
 	const theme = useTheme();
+	const { status } = useSession();
 	return (
 		<Box sx={{ display: 'flex'}}>
 			<CssBaseline />
@@ -113,6 +112,7 @@ const NavLayout: React.FC = ({ children }) => {
 						</StyledListItemButton>
 					</Link>
 				</List>
+				{ status === "authenticated" ? 
 				<List sx={{height: '100%', display: 'flex', alignItems: 'flex-end'}}>
 					<StyledListItemButton onClick={() => signOut()} alignItems='center'>
 							<StyledListItemIcon>
@@ -120,7 +120,8 @@ const NavLayout: React.FC = ({ children }) => {
 							</StyledListItemIcon>
 						<StyledItemText primary={'Logout'} />
 					</StyledListItemButton>
-				</List>
+				</List> : null
+				}
 			</StyledDrawer>
 			<Box
 				component='main'
