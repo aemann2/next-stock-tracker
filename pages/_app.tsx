@@ -34,6 +34,9 @@ const theme = createTheme({
 		secondary: {
 			main: indigo[800],
 		},
+		warning: {
+			main: '#b44b50'
+		}
   },
 });
 

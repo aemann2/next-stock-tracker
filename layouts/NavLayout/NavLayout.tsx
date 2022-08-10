@@ -21,6 +21,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { styled } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
 import { indigo } from '@mui/material/colors';
+import { useRouter } from 'next/router';
 
 const drawerWidth = 240;
 
@@ -36,13 +37,19 @@ const StyledListItemIcon = styled(ListItemIcon)<ListItemIconProps>(() => ({
   color: indigo[50],
 }));
 
-const StyledListItemButton = styled(ListItemButton)<ListItemButtonProps>(() => ({
+const StyledListItemButton = styled(ListItemButton)<any>(({ theme, linkhref, pagehref }) => (
+	linkhref && linkhref === pagehref ? 
+	{
+		'.MuiListItemIcon-root, .MuiTypography-root': {
+			color: theme.palette.warning.main
+		} 
+} : {
 	'&:hover': {
 		'.MuiListItemIcon-root, .MuiTypography-root': {
-			color: 'yellow'
-		}
+		color: 'yellow'
 	}
-}));
+	}
+} ));
 
 const StyledDrawer = styled(Drawer)<DrawerProps>(({ theme }) => ({
 	width: drawerWidth,
@@ -57,6 +64,8 @@ const StyledDrawer = styled(Drawer)<DrawerProps>(({ theme }) => ({
 }))
 
 const NavLayout: React.FC = ({ children }) => {
+	const router = useRouter();
+	const pagehref = router.pathname;
 	const theme = useTheme();
 	const { status } = useSession();
 	return (
@@ -72,7 +81,7 @@ const NavLayout: React.FC = ({ children }) => {
 			>
 				<List>
 					<Link href='/home' passHref>
-						<StyledListItemButton>
+						<StyledListItemButton linkhref={'/home'} pagehref={pagehref}>
 							<StyledListItemIcon >
 								<HomeIcon/>
 							</StyledListItemIcon>
@@ -80,7 +89,7 @@ const NavLayout: React.FC = ({ children }) => {
 						</StyledListItemButton>
 					</Link>
 					<Link href='/buy' passHref>
-						<StyledListItemButton>
+						<StyledListItemButton linkhref='/buy' pagehref={pagehref}>
 							<StyledListItemIcon>
 								<ShoppingCartIcon/>
 							</StyledListItemIcon>
@@ -88,7 +97,7 @@ const NavLayout: React.FC = ({ children }) => {
 						</StyledListItemButton>
 					</Link>
 					<Link href='/sell' passHref>
-						<StyledListItemButton>
+						<StyledListItemButton linkhref='/sell' pagehref={pagehref}>
 							<StyledListItemIcon>
 								<AttachMoneyIcon/>
 							</StyledListItemIcon>
@@ -96,7 +105,7 @@ const NavLayout: React.FC = ({ children }) => {
 						</StyledListItemButton>
 					</Link>
 					<Link href='/quote' passHref>
-						<StyledListItemButton>
+						<StyledListItemButton linkhref='/quote' pagehref={pagehref}>
 							<StyledListItemIcon>
 								<HelpIcon/>
 							</StyledListItemIcon>
@@ -104,7 +113,7 @@ const NavLayout: React.FC = ({ children }) => {
 						</StyledListItemButton>
 					</Link>
 					<Link href='/history' passHref>
-						<StyledListItemButton>
+						<StyledListItemButton linkhref='/history' pagehref={pagehref}>
 							<StyledListItemIcon>
 								<HistoryIcon/>
 							</StyledListItemIcon>
