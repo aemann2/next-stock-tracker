@@ -1,6 +1,6 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
-import NavLayout from '../layouts/NavLayout/NavLayout';
+import NavLayout from '../layouts/NavLayout';
 
 import { ApolloProvider } from '@apollo/client';
 import { useApollo } from '../lib/apolloClient';

@@ -3,11 +3,12 @@ import Link from 'next/link';
 
 import { signOut, useSession } from 'next-auth/react';
 
+import MainLayout from './MainLayout';
+
 import Box from '@mui/material/Box';
 import Drawer, {DrawerProps} from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import ListItemIcon, { ListItemIconProps } from '@mui/material/ListItemIcon';
 import ListItemButton, {ListItemButtonProps} from '@mui/material/ListItemButton';
@@ -19,7 +20,6 @@ import HelpIcon from '@mui/icons-material/Help';
 import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { styled } from '@mui/material/styles';
-import { useTheme } from '@mui/material/styles';
 import { indigo } from '@mui/material/colors';
 import { useRouter } from 'next/router';
 
@@ -67,8 +67,7 @@ const StyledDrawer = styled(Drawer)<DrawerProps>(({ theme }) => ({
 	}
 }))
 
-const NavLayout: React.FC = ({ children }) => {
-	const theme = useTheme();
+const NavLayout: React.FC = ({children}) => {
 	const { status } = useSession();
 	return (
 		<Box sx={{ display: 'flex'}}>
@@ -134,13 +133,9 @@ const NavLayout: React.FC = ({ children }) => {
 				</List> : null
 				}
 			</StyledDrawer>
-			<Box
-				component='main'
-				sx={{ flexGrow: 1, backgroundColor: theme.palette.primary.main, p: 3 }}
-			>
-				<Toolbar />
+			<MainLayout>
 				{children}
-			</Box>
+			</MainLayout>
 		</Box>
 	);
 };
