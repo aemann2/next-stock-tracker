@@ -37,8 +37,12 @@ const StyledListItemIcon = styled(ListItemIcon)<ListItemIconProps>(() => ({
   color: indigo[50],
 }));
 
-const StyledListItemButton = styled(ListItemButton)<any>(({ theme, linkhref, pagehref }) => (
-	linkhref && linkhref === pagehref ? 
+interface customListItemButtonProps extends ListItemButtonProps {
+	href?: String;
+}
+
+const StyledListItemButton = styled(ListItemButton)<customListItemButtonProps>(({ theme, href }) => (
+	href && href === useRouter().pathname ? 
 	{
 		'.MuiListItemIcon-root, .MuiTypography-root': {
 			color: theme.palette.warning.main
@@ -64,8 +68,6 @@ const StyledDrawer = styled(Drawer)<DrawerProps>(({ theme }) => ({
 }))
 
 const NavLayout: React.FC = ({ children }) => {
-	const router = useRouter();
-	const pagehref = router.pathname;
 	const theme = useTheme();
 	const { status } = useSession();
 	return (
@@ -81,7 +83,7 @@ const NavLayout: React.FC = ({ children }) => {
 			>
 				<List>
 					<Link href='/home' passHref>
-						<StyledListItemButton linkhref={'/home'} pagehref={pagehref}>
+						<StyledListItemButton>
 							<StyledListItemIcon >
 								<HomeIcon/>
 							</StyledListItemIcon>
@@ -89,7 +91,7 @@ const NavLayout: React.FC = ({ children }) => {
 						</StyledListItemButton>
 					</Link>
 					<Link href='/buy' passHref>
-						<StyledListItemButton linkhref='/buy' pagehref={pagehref}>
+						<StyledListItemButton>
 							<StyledListItemIcon>
 								<ShoppingCartIcon/>
 							</StyledListItemIcon>
@@ -97,7 +99,7 @@ const NavLayout: React.FC = ({ children }) => {
 						</StyledListItemButton>
 					</Link>
 					<Link href='/sell' passHref>
-						<StyledListItemButton linkhref='/sell' pagehref={pagehref}>
+						<StyledListItemButton>
 							<StyledListItemIcon>
 								<AttachMoneyIcon/>
 							</StyledListItemIcon>
@@ -105,7 +107,7 @@ const NavLayout: React.FC = ({ children }) => {
 						</StyledListItemButton>
 					</Link>
 					<Link href='/quote' passHref>
-						<StyledListItemButton linkhref='/quote' pagehref={pagehref}>
+						<StyledListItemButton>
 							<StyledListItemIcon>
 								<HelpIcon/>
 							</StyledListItemIcon>
@@ -113,7 +115,7 @@ const NavLayout: React.FC = ({ children }) => {
 						</StyledListItemButton>
 					</Link>
 					<Link href='/history' passHref>
-						<StyledListItemButton linkhref='/history' pagehref={pagehref}>
+						<StyledListItemButton>
 							<StyledListItemIcon>
 								<HistoryIcon/>
 							</StyledListItemIcon>
