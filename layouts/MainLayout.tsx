@@ -10,7 +10,7 @@ const MainLayout: React.FC = ({ children }) => {
 	return (
 		<Box
 		component='main'
-		sx={{ flexGrow: 1, backgroundColor: theme.palette.primary.main, color:theme.palette.primary.contrastText, p: 3 }}
+		sx={{ flexGrow: 1, backgroundColor: theme.palette.primary.main, color:theme.palette.primary.contrastText, p: 3, height:'100vh' }}
 	>
 		<Toolbar />
 		{children}
