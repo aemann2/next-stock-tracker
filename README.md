@@ -1,3 +1,11 @@
+# [Next Stock Tracker](https://next-stock-tracker.vercel.app/)
+
+**Next Stock Tracker** is a Next.js application for simulating the buying and selling of stocks. This project uses Next.js as a full stack framework, NextAuth for authentication, Postgres for storage, Prisma/GraphQL for data querying, the [IEX Cloud API](https://iexcloud.io/docs/api/) to collect stock information, and Vercel for deployment. 
+
+Next Stock Tracker is modeled after the [Harvard CS50 Finance project](https://cs50.harvard.edu/x/2020/tracks/web/finance/) project, which uses Python and Flask as its framework.   
+
+---
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 [Project board link](https://github.com/aemann2/next-stock-tracker/projects/1)
