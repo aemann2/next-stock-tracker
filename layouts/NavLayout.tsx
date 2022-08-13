@@ -12,12 +12,13 @@ import IconButton from '@mui/material/IconButton';
 import CssBaseline from '@mui/material/CssBaseline';
 import AppBar from '@mui/material/AppBar';
 import List from '@mui/material/List';
-import MenuIcon from '@mui/icons-material/Menu';
 
 import ListItemIcon, { ListItemIconProps } from '@mui/material/ListItemIcon';
 import ListItemButton, {ListItemButtonProps} from '@mui/material/ListItemButton';
 import ListItemText, {ListItemTextProps} from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import MenuIcon from '@mui/icons-material/Menu';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import HelpIcon from '@mui/icons-material/Help';
@@ -159,7 +160,7 @@ const NavLayout= (props: Props) => {
 					ml: { sm: `${drawerWidth}px` } 
 				}}
 			>
-			<Toolbar sx={{display: { sm: 'none' }}}>
+			<Toolbar sx={{display: {xs: 'flex', sm:'none'}, justifyContent:'space-between'}}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -169,6 +170,11 @@ const NavLayout= (props: Props) => {
           >
             <MenuIcon />
           </IconButton>
+					<IconButton
+						color='inherit'
+					>
+						<DarkModeIcon />
+					</IconButton>
         </Toolbar>
 			</AppBar>
 			<Box
