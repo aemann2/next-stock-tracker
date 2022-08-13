@@ -34,11 +34,11 @@ const mobileDrawerWidth = 150;
 const StyledItemText = styled(ListItemText)<ListItemTextProps>(({ theme }) => ({
   color: theme.palette.primary.contrastText,
   '& .MuiTypography-root': {
-		fontWeight: 700,
+		fontWeight: 600,
 		fontSize: 15,
     [theme.breakpoints.up('sm')]: {
       fontSize: 20,
-			fontWeight: 500,
+			fontWeight: 700,
     },
   },
 }));
