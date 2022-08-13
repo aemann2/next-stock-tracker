@@ -27,13 +27,18 @@ import { styled } from '@mui/material/styles';
 import { indigo } from '@mui/material/colors';
 import { useRouter } from 'next/router';
 
-const drawerWidth = 240;
+const drawerWidth = 200;
+const mobileDrawerWidth = 150;
 
 const StyledItemText = styled(ListItemText)<ListItemTextProps>(({ theme }) => ({
   color: theme.palette.primary.contrastText,
   '& .MuiTypography-root': {
 		fontWeight: 700,
-		fontSize: 20,
+		fontSize: 15,
+    [theme.breakpoints.up('sm')]: {
+      fontSize: 20,
+			fontWeight: 500,
+    },
   },
 }));
 
@@ -72,10 +77,6 @@ const StyledDrawer = styled(Drawer)<DrawerProps>(({ theme }) => ({
 }))
 
 interface Props {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
 	children: JSX.Element;
   window?: () => Window;
 }
@@ -158,7 +159,7 @@ const NavLayout= (props: Props) => {
 					ml: { sm: `${drawerWidth}px` } 
 				}}
 			>
-			<Toolbar>
+			<Toolbar sx={{display: { sm: 'none' }}}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -184,7 +185,7 @@ const NavLayout= (props: Props) => {
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: mobileDrawerWidth },
           }}
         >
 					{navLinks}
